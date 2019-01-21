@@ -1,5 +1,3 @@
-#kinda works but actually needs to be in a class.
-
 # This program demonstrates usage of the digital encoders.
 # After executing the program, manually spin the wheels and observe the output.
 # See https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/ for more details.
@@ -8,8 +6,6 @@ import time
 import RPi.GPIO as GPIO
 import signal
 
-
-
 # Pins that the encoders are connected to
 LENCODER = 17
 RENCODER = 18
@@ -17,14 +13,10 @@ RENCODER = 18
 # This function is called when the left encoder detects a rising edge signal.
 def onLeftEncode(pin):
     print("Left encoder ticked!")
-    global step_count
-    step_count = (step_count[0]+1, step_count[1])
 
 # This function is called when the right encoder detects a rising edge signal.
 def onRightEncode(pin):
     print("Right encoder ticked!")
-    global step_count
-    step_count = (step_count[0], step_count[1]+1)
 
 # This function is called when Ctrl+C is pressed.
 # It's intended for properly exiting the program.
@@ -49,30 +41,6 @@ GPIO.setup(RENCODER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(LENCODER, GPIO.RISING, onLeftEncode)
 GPIO.add_event_detect(RENCODER, GPIO.RISING, onRightEncode)
 
-##### Added code
-
-# Initalizes Encoders
-def initEncoders():
-    global step_count
-    step_count = (0,0)
-
-def resetCounts():
-    global step_count
-    step_count = (0,0)
-
-# Returns left and right ticks from the encoders
-# (left count, right count)
-def getCounts():
-    print(step_count)
-
-
-
-
-
-######
-
 # Prevent the program from exiting by adding a looping delay.
-initEncoders()
 while True:
     time.sleep(1)
-    getCounts()
