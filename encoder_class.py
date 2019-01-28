@@ -82,13 +82,14 @@ class Encoder():
 
     # Creates a mapping from the servo input to the wheel speed
     def calibrateSpeeds(self):
-	calibrated_speeds = []
+    speeds = []
         for i in self.calibrated_inputs:
             pwm.set_pwm(RSERVO, 0, math.floor(i / 20 * 4096))
             pwm.set_pwm(LSERVO, 0, math.floor(i / 20 * 4096))
-            calibrated_speeds.append(self.getSpeeds())
+            speeds.append(self.getSpeeds())
         pwm.set_pwm(RSERVO, 0, 0)
         pwm.set_pwm(LSERVO, 0, 0)
+        self.calibrated_speeds = speeds
 
 ## Main program
 if __name__ == "__main__":
