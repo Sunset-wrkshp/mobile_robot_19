@@ -11,6 +11,8 @@ class Encoder():
     step_count = ()
     LENCODER = 17
     RENCODER = 18
+    calibrated_inputs = [1.4, 1.7]
+    calibrated_speeds = []
 
     def __init__(self):
         self.step_count = (0,0)
@@ -66,12 +68,28 @@ class Encoder():
     # returns speed of left and right wheels
     # (left speed, right speed)
     def getSpeeds(self):
-        #get time
-        #get counts
-        #wait
-        #get time again
-        #get counts 
+	count_change = []
+        initial_time = time.monotonic()
+        initial_count = self.step_counts
+        
+        time.sleep(0.32)        
+        
+        time_change = time.monotonic() - initial_time
+        count_change = (self.step_counts[0] - initial_count[0], self.step_counts[1] - initial_count[1])
+        speeds = (count_change[0] / (time_change * 32.0), count_change[1] / (time_change * 32.0))
+                 
+        return speeds
 
+    # Creates a mapping from the servo input to the wheel speed
+    def calibrateSpeeds(self):
+    speeds = []
+        for i in self.calibrated_inputs:
+            pwm.set_pwm(RSERVO, 0, math.floor(i / 20 * 4096))
+            pwm.set_pwm(LSERVO, 0, math.floor(i / 20 * 4096))
+            speeds.append(self.getSpeeds())
+        pwm.set_pwm(RSERVO, 0, 0)
+        pwm.set_pwm(LSERVO, 0, 0)
+        self.calibrated_speeds = speeds
 
 ## Main program
 if __name__ == "__main__":
