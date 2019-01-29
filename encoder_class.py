@@ -6,13 +6,20 @@
 import time
 import RPi.GPIO as GPIO
 import signal
+import Adafruit_PCA9685
+import math
 
 class Encoder():
     step_count = ()
     LENCODER = 17
     RENCODER = 18
-    calibrated_inputs = [1.4, 1.7]
+    calibrated_inputs = [1.3,1.4,1.5,1.6,1.7]
     calibrated_speeds = []
+    # The servo hat uses its own numbering scheme within the Adafruit library.
+    # 0 represents the first servo, 1 for the second, and so on.
+    LSERVO = 0
+    RSERVO = 1
+    pwm = None
 
     def __init__(self):
         self.step_count = (0,0)
@@ -31,6 +38,12 @@ class Encoder():
         # Attach a rising edge interrupt to the encoder pins
         GPIO.add_event_detect(self.LENCODER, GPIO.RISING, self.onLeftEncode)
         GPIO.add_event_detect(self.RENCODER, GPIO.RISING, self.onRightEncode)
+
+        # Initialize the servo hat library.
+        self.pwm = Adafruit_PCA9685.PCA9685()
+
+        # 50Hz is used for the frequency of the servos.
+        self.pwm.set_pwm_freq(50)
 
     # Pins that the encoders are connected to
 
@@ -65,35 +78,42 @@ class Encoder():
     # (left count, right count)
     def getCounts(self):
         print(self.step_count)
-    # returns speed of left and right wheels
-    # (left speed, right speed)
+
+    # returns revolutions per second of left and right wheels
+    # (left rps, right rps)
     def getSpeeds(self):
-	count_change = []
+        count_change = []
         initial_time = time.monotonic()
-        initial_count = self.step_counts
-        
-        time.sleep(0.32)        
-        
+        initial_count = self.step_count
+
+        time.sleep(0.32)
+
         time_change = time.monotonic() - initial_time
-        count_change = (self.step_counts[0] - initial_count[0], self.step_counts[1] - initial_count[1])
+        count_change = (self.step_count[0] - initial_count[0], self.step_count[1] - initial_count[1])
         speeds = (count_change[0] / (time_change * 32.0), count_change[1] / (time_change * 32.0))
-                 
+
         return speeds
 
     # Creates a mapping from the servo input to the wheel speed
     def calibrateSpeeds(self):
-    speeds = []
+        speeds = []
         for i in self.calibrated_inputs:
-            pwm.set_pwm(RSERVO, 0, math.floor(i / 20 * 4096))
-            pwm.set_pwm(LSERVO, 0, math.floor(i / 20 * 4096))
+            self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
+            self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
             speeds.append(self.getSpeeds())
-        pwm.set_pwm(RSERVO, 0, 0)
-        pwm.set_pwm(LSERVO, 0, 0)
+            time.sleep(2)
+        self.pwm.set_pwm(self.RSERVO, 0, 0)
+        self.pwm.set_pwm(self.LSERVO, 0, 0)
         self.calibrated_speeds = speeds
 
 ## Main program
 if __name__ == "__main__":
+
     d = Encoder()
     while True:
         time.sleep(1)
-        d.getCounts()
+        # d.getCounts()
+        d.calibrateSpeeds()
+        print(d.calibrated_speeds)
+        break
+        # d.getSpeeds()
