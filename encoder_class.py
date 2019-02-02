@@ -13,7 +13,7 @@ class Encoder():
     step_count = ()
     LENCODER = 17
     RENCODER = 18
-    calibrated_inputs = [1.4,1.45,1.5,1.55,1.6]
+    calibrated_inputs = [1.4,1.425,1.45,1.475,1.5,1.525,1.55,1.575,1.6]
     calibrated_speeds = []
     last_tick_time = [time.monotonic(), time.monotonic()]
     prev_tick_time = [time.monotonic(), time.monotonic()]
@@ -53,7 +53,7 @@ class Encoder():
 
     # This function is called when the left encoder detects a rising edge signal.
     def onLeftEncode(self , pin):
-        print("Left encoder ticked!")
+        # print("Left encoder ticked!")
         self.step_count = (self.step_count[0]+1, self.step_count[1])
         # Record the time when the encoders are ticked
         self.prev_tick_time[0] = self.last_tick_time[0]
@@ -61,7 +61,7 @@ class Encoder():
 
     # This function is called when the right encoder detects a rising edge signal.
     def onRightEncode(self, pin):
-        print("Right encoder ticked!")
+        # print("Right encoder ticked!")
         # global step_count
         self.step_count = (self.step_count[0], self.step_count[1]+1)
         self.prev_tick_time[1] = self.last_tick_time[1]
@@ -92,19 +92,19 @@ class Encoder():
     def getSpeeds(self):
         speeds = []
         current_time = time.monotonic()
-        if (current_time - self.last_tick_time[0] > 1){
+        if (current_time - self.last_tick_time[0] > 1):
             speeds.append(0)
-        } else {
+        else:
             speeds.append(min(1 / ((current_time - self.last_tick_time[0]) * 32.0),
                               1 / ((self.last_tick_time[0] - self.prev_tick_time[0]) * 32.0)))
-        }
 
-        if (current_time - self.last_tick_time[1] > 1){
+
+        if (current_time - self.last_tick_time[1] > 1):
             speeds.append(0)
-        } else {
+        else:
             speeds.append(min(1 / ((current_time - self.last_tick_time[1]) * 32.0),
                               1 / ((self.last_tick_time[1] - self.prev_tick_time[1]) * 32.0)))
-        }
+
 
         return tuple(speeds)
 
@@ -115,7 +115,11 @@ class Encoder():
             self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
             self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
             time.sleep(2)
-            speeds.append(self.getSpeeds())
+            measured_speed = self.getSpeeds()
+            if (i < 1.5):
+                speeds.append((-measured_speed[0], measured_speed[1]))
+            else:
+                speeds.append((measured_speed[0], -measured_speed[1]))
         self.pwm.set_pwm(self.RSERVO, 0, 0)
         self.pwm.set_pwm(self.LSERVO, 0, 0)
         self.calibrated_speeds = speeds
