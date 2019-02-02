@@ -124,6 +124,57 @@ class Encoder():
         self.pwm.set_pwm(self.LSERVO, 0, 0)
         self.calibrated_speeds = speeds
 
+
+    def setSpeedsRPS(self, L, R):
+        l_i = self.find_index(L, self.calibrated_speeds, 0)
+        r_i = self.find_index(R, self.calibrated_speeds, 1)
+        print(self.calibrated_inputs[l_i])
+        print(self.calibrated_speeds[l_i])
+        print(self.calibrated_inputs[r_i])
+        print(self.calibrated_speeds[r_i])
+        self.pwm.set_pwm(self.LSERVO, 0, math.floor(self.calibrated_inputs[l_i] / 20 * 4096));
+        self.pwm.set_pwm(self.RSERVO, 0, math.floor(self.calibrated_inputs[r_i] / 20 * 4096));
+
+
+
+    #linear search, returns closest index
+    # 0 for ascending list, 1 for descending list
+    def find_index(self, num, data, dir):
+          i = 0
+          last = 0
+          cur = 0
+          if dir == 0:
+            while(i < len(data)):
+              if data[i][0] == num:
+                  return i
+              elif data[i][0] < num:
+                  last = i
+                  i+=1
+              elif data[i][0] > num:
+                  last = i-1
+                  cur = i
+                  if (abs(num - data[last][0]) < abs(num - data[cur][0])):
+                      return last
+                  else:
+                      return cur
+          else:
+            while(i < len(data)):
+                if data[i][1] == num:
+                    return i
+                elif data[i][1] > num:
+                    last = i
+                    i+=1
+                elif data[i][1] < num:
+                    last = i-1
+                    cur = i
+                    if (abs(num - data[last][1]) < abs(num - data[cur][1])):
+                        return last
+                    else:
+                        return cur
+
+
+
+
     # Set speed based on velocity v and angular velocity w
 """
     def setSpeedsvw(self, v, w):
@@ -133,15 +184,21 @@ class Encoder():
         # VR = w (R-dmid)
         setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
 """
-
 ## Main program
 if __name__ == "__main__":
 
     d = Encoder()
-    while True:
+    while(1):
         time.sleep(1)
         # d.getCounts()
         d.calibrateSpeeds()
         print(d.calibrated_speeds)
+
+        time.sleep(5)
+        print("set speed")
+        d.setSpeedsRPS(.4,.4)
+        time.sleep(3)
+        d.setSpeedsRPS(0,0)
         break
+
         # d.getSpeeds()
