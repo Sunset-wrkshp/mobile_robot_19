@@ -136,9 +136,11 @@ class Encoder():
         self.pwm.set_pwm(self.RSERVO, 0, math.floor(self.calibrated_inputs[r_i] / 20 * 4096));
 
 
+    # def setSpeedsIPS(self, L, R):
 
     #linear search, returns closest index
     # 0 for ascending list, 1 for descending list
+    #FIX does not return anything for values out of range.
     def find_index(self, num, data, dir):
           i = 0
           last = 0
@@ -157,6 +159,7 @@ class Encoder():
                       return last
                   else:
                       return cur
+            return len(data) - 1
           else:
             while(i < len(data)):
                 if data[i][1] == num:
@@ -171,7 +174,7 @@ class Encoder():
                         return last
                     else:
                         return cur
-
+            return len(data) - 1
 
 
 
@@ -196,9 +199,30 @@ if __name__ == "__main__":
 
         time.sleep(5)
         print("set speed")
-        d.setSpeedsRPS(.4,.4)
-        time.sleep(3)
+        test = .4
+        print("Testing speeds {test}, {test}".format(test = test))
+        d.setSpeedsRPS(test,test)
+        time.sleep(2)
         d.setSpeedsRPS(0,0)
+        time.sleep(2)
+        test = .7
+        print("Testing speeds {test}, {test}".format(test = test))
+        d.setSpeedsRPS(test,test)
+        time.sleep(2)
+        d.setSpeedsRPS(0,0)
+        time.sleep(2)
+        test = -.5
+        print("Testing speeds {test}, {test}".format(test = test))
+        d.setSpeedsRPS(test,test)
+        time.sleep(2)
+        d.setSpeedsRPS(0,0)
+        time.sleep(2)
+        test = -.8
+        print("Testing speeds {test}, {test}".format(test = test))
+        d.setSpeedsRPS(test,test)
+        time.sleep(2)
+        d.setSpeedsRPS(0,0)
+        time.sleep(2)
         break
 
         # d.getSpeeds()
