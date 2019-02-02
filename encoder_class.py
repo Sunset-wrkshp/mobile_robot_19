@@ -13,8 +13,11 @@ class Encoder():
     step_count = ()
     LENCODER = 17
     RENCODER = 18
-    calibrated_inputs = [1.3,1.4,1.5,1.6,1.7]
+    calibrated_inputs = [1.4,1.45,1.5,1.55,1.6]
     calibrated_speeds = []
+    last_tick_time = [time.monotonic(), time.monotonic()]
+    prev_tick_time = [time.monotonic(), time.monotonic()]
+
     # The servo hat uses its own numbering scheme within the Adafruit library.
     # 0 represents the first servo, 1 for the second, and so on.
     LSERVO = 0
@@ -52,12 +55,17 @@ class Encoder():
     def onLeftEncode(self , pin):
         print("Left encoder ticked!")
         self.step_count = (self.step_count[0]+1, self.step_count[1])
+        # Record the time when the encoders are ticked
+        self.prev_tick_time[0] = self.last_tick_time[0]
+        self.last_tick_time[0] = time.monotonic()
 
     # This function is called when the right encoder detects a rising edge signal.
     def onRightEncode(self, pin):
         print("Right encoder ticked!")
         # global step_count
         self.step_count = (self.step_count[0], self.step_count[1]+1)
+        self.prev_tick_time[1] = self.last_tick_time[1]
+        self.last_tick_time[1] = time.monotonic()
 
     # This function is called when Ctrl+C is pressed.
     # It's intended for properly exiting the program.
@@ -82,17 +90,23 @@ class Encoder():
     # returns revolutions per second of left and right wheels
     # (left rps, right rps)
     def getSpeeds(self):
-        count_change = []
-        initial_time = time.monotonic()
-        initial_count = self.step_count
+        speeds = []
+        current_time = time.monotonic()
+        if (current_time - self.last_tick_time[0] > 1){
+            speeds.append(0)
+        } else {
+            speeds.append(min(1 / ((current_time - self.last_tick_time[0]) * 32.0),
+                              1 / ((self.last_tick_time[0] - self.prev_tick_time[0]) * 32.0)))
+        }
 
-        time.sleep(0.32)
+        if (current_time - self.last_tick_time[1] > 1){
+            speeds.append(0)
+        } else {
+            speeds.append(min(1 / ((current_time - self.last_tick_time[1]) * 32.0),
+                              1 / ((self.last_tick_time[1] - self.prev_tick_time[1]) * 32.0)))
+        }
 
-        time_change = time.monotonic() - initial_time
-        count_change = (self.step_count[0] - initial_count[0], self.step_count[1] - initial_count[1])
-        speeds = (count_change[0] / (time_change * 32.0), count_change[1] / (time_change * 32.0))
-
-        return speeds
+        return tuple(speeds)
 
     # Creates a mapping from the servo input to the wheel speed
     def calibrateSpeeds(self):
@@ -100,11 +114,21 @@ class Encoder():
         for i in self.calibrated_inputs:
             self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
             self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
-            speeds.append(self.getSpeeds())
             time.sleep(2)
+            speeds.append(self.getSpeeds())
         self.pwm.set_pwm(self.RSERVO, 0, 0)
         self.pwm.set_pwm(self.LSERVO, 0, 0)
         self.calibrated_speeds = speeds
+
+    # Set speed based on velocity v and angular velocity w
+"""
+    def setSpeedsvw(self, v, w):
+        R = v / w
+        d_mid = 3.95 / 2
+        # VL = w (R+dmid)
+        # VR = w (R-dmid)
+        setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
+"""
 
 ## Main program
 if __name__ == "__main__":
