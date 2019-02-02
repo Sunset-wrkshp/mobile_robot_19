@@ -136,7 +136,8 @@ class Encoder():
         self.pwm.set_pwm(self.RSERVO, 0, math.floor(self.calibrated_inputs[r_i] / 20 * 4096));
 
 
-    # def setSpeedsIPS(self, L, R):
+    def setSpeedsIPS(self, L, R):
+        self.setSpeedsRPS((L/(2.5*math.pi)), (R/(2.5*math.pi)))
 
     #linear search, returns closest index
     # 0 for ascending list, 1 for descending list
@@ -199,30 +200,57 @@ if __name__ == "__main__":
 
         time.sleep(5)
         print("set speed")
-        test = .4
-        print("Testing speeds {test}, {test}".format(test = test))
-        d.setSpeedsRPS(test,test)
-        time.sleep(2)
+        test = 1
+        print("testing inches: {test}".format(test = test))
+        d.setSpeedsIPS(test, test)
+        time.sleep(3)
         d.setSpeedsRPS(0,0)
         time.sleep(2)
-        test = .7
-        print("Testing speeds {test}, {test}".format(test = test))
-        d.setSpeedsRPS(test,test)
-        time.sleep(2)
+
+        test = .5
+        print("testing inches: {test}".format(test = test))
+        d.setSpeedsIPS(test, test)
+        time.sleep(3)
         d.setSpeedsRPS(0,0)
         time.sleep(2)
-        test = -.5
-        print("Testing speeds {test}, {test}".format(test = test))
-        d.setSpeedsRPS(test,test)
-        time.sleep(2)
+
+        test = 4
+        print("testing inches: {test}".format(test = test))
+        d.setSpeedsIPS(test, test)
+        time.sleep(3)
         d.setSpeedsRPS(0,0)
         time.sleep(2)
-        test = -.8
-        print("Testing speeds {test}, {test}".format(test = test))
-        d.setSpeedsRPS(test,test)
-        time.sleep(2)
+
+        test = 10
+        print("testing inches: {test}".format(test = test))
+        d.setSpeedsIPS(test, test)
+        time.sleep(3)
         d.setSpeedsRPS(0,0)
         time.sleep(2)
+        # test = .4
+        # print("Testing speeds {test}, {test}".format(test = test))
+        # d.setSpeedsRPS(test,test)
+        # time.sleep(2)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        # test = .7
+        # print("Testing speeds {test}, {test}".format(test = test))
+        # d.setSpeedsRPS(test,test)
+        # time.sleep(2)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        # test = -.5
+        # print("Testing speeds {test}, {test}".format(test = test))
+        # d.setSpeedsRPS(test,test)
+        # time.sleep(2)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        # test = -.8
+        # print("Testing speeds {test}, {test}".format(test = test))
+        # d.setSpeedsRPS(test,test)
+        # time.sleep(2)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
         break
 
         # d.getSpeeds()
