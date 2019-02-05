@@ -8,7 +8,6 @@ import RPi.GPIO as GPIO
 import signal
 import Adafruit_PCA9685
 import math
-import matplotlib.pyplot as plt
 
 class Encoder():
     step_count = ()

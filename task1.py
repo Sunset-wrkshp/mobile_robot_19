@@ -1,4 +1,5 @@
 from encoder_class import Encoder
+import matplotlib.pyplot as plt
 
 class Encoder_Task1(Encoder)
     def setSpeeds(self, Lspeed, Rspeed):
