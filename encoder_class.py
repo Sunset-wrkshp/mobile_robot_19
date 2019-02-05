@@ -67,6 +67,11 @@ class Encoder():
         self.prev_tick_time[1] = self.last_tick_time[1]
         self.last_tick_time[1] = time.monotonic()
 
+    # Just stops the robot
+    def stop(self):
+        self.pwm.set_pwm(self.RSERVO, 0, 0)
+        self.pwm.set_pwm(self.LSERVO, 0, 0)
+
     # This function is called when Ctrl+C is pressed.
     # It's intended for properly exiting the program.
     def ctrlC(self, signum, frame):
