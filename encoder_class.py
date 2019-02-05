@@ -177,17 +177,14 @@ class Encoder():
                         return cur
             return len(data) - 1
 
-
-
     # Set speed based on velocity v and angular velocity w
-"""
     def setSpeedsvw(self, v, w):
         R = v / w
         d_mid = 3.95 / 2
         # VL = w (R+dmid)
         # VR = w (R-dmid)
-        setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
-"""
+        self.setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
+
 ## Main program
 if __name__ == "__main__":
 
