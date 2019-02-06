@@ -77,6 +77,7 @@ class Encoder():
     def ctrlC(self, signum, frame):
         print("Exiting")
         GPIO.cleanup()
+        self.stop()
         exit()
 
     # Initalizes Encoders
@@ -135,12 +136,12 @@ class Encoder():
         l_i = self.find_index(L, self.calibrated_speeds, 0)
         r_i = self.find_index(R, self.calibrated_speeds, 1)
         if(isinstance(l_i, tuple)):
-            l_ms = inter( self.calibrated_speeds[l_i[0]][0], self.calibrated_inputs[l_i[0]],
+            l_ms = self.inter( self.calibrated_speeds[l_i[0]][0], self.calibrated_inputs[l_i[0]],
                           self.calibrated_speeds[l_i[1]][0], self.calibrated_inputs[l_i[1]], L )
         else:
             l_ms = self.calibrated_inputs[l_i]
         if(isinstance(r_i, tuple)):
-            r_ms = inter( self.calibrated_speeds[r_i[0]][1], self.calibrated_inputs[r_i[0]],
+            r_ms = self.inter( self.calibrated_speeds[r_i[0]][1], self.calibrated_inputs[r_i[0]],
                           self.calibrated_speeds[r_i[1]][1], self.calibrated_inputs[r_i[1]], R )
         else:
             r_ms = self.calibrated_inputs[r_i]
@@ -215,39 +216,39 @@ if __name__ == "__main__":
     d = Encoder()
     while(1):
         time.sleep(1)
-        # d.getCounts()
         d.calibrateSpeeds()
         print(d.calibrated_speeds)
 
         time.sleep(5)
         print("set speed")
-        test = 1
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
+        test = .2
+        print("testing RPS: {test}".format(test = test))
+        d.setSpeedsRPS(test, test)
         time.sleep(3)
         d.setSpeedsRPS(0,0)
         time.sleep(2)
-
-        test = .5
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
-        time.sleep(3)
-        d.setSpeedsRPS(0,0)
-        time.sleep(2)
-
-        test = 4
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
-        time.sleep(3)
-        d.setSpeedsRPS(0,0)
-        time.sleep(2)
-
-        test = 10
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
-        time.sleep(3)
-        d.setSpeedsRPS(0,0)
-        time.sleep(2)
+        d.stop()
+        #
+        # test = -.6
+        # print("testing RPS: {test}".format(test = test))
+        # d.setSpeedsRPS(test, test)
+        # time.sleep(3)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        #
+        # test = .75
+        # print("testing RPS: {test}".format(test = test))
+        # d.setSpeedsRPS(test, test)
+        # time.sleep(3)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        #
+        # test = -.63
+        # print("testing RPS: {test}".format(test = test))
+        # d.setSpeedsRPS(test, test)
+        # time.sleep(3)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
         # test = .4
         # print("Testing speeds {test}, {test}".format(test = test))
         # d.setSpeedsRPS(test,test)
