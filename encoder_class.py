@@ -13,7 +13,10 @@ class Encoder():
     step_count = ()
     LENCODER = 17
     RENCODER = 18
-    calibrated_inputs = [1.4,1.425,1.45,1.475,1.5,1.525,1.55,1.575,1.6]
+    WDIAMETER = 2.625
+    WSEPARATION = 4.125
+    
+    calibrated_inputs = [1.4,1.41,1.42,1.43,1.44,1.45,1.46,1.47,1.48,1.49,1.5,1.51,1.52,1.53,1.54,1.55,1.56,1.57,1.58,1.59,1.6]
     calibrated_speeds = []
     last_tick_time = [time.monotonic(), time.monotonic()]
     prev_tick_time = [time.monotonic(), time.monotonic()]
@@ -66,7 +69,7 @@ class Encoder():
         self.step_count = (self.step_count[0], self.step_count[1]+1)
         self.prev_tick_time[1] = self.last_tick_time[1]
         self.last_tick_time[1] = time.monotonic()
-
+    
     # Just stops the robot
     def stop(self):
         self.pwm.set_pwm(self.RSERVO, 0, 0)
@@ -133,16 +136,16 @@ class Encoder():
     def setSpeedsRPS(self, L, R):
         l_i = self.find_index(L, self.calibrated_speeds, 0)
         r_i = self.find_index(R, self.calibrated_speeds, 1)
-        print(self.calibrated_inputs[l_i])
-        print(self.calibrated_speeds[l_i])
-        print(self.calibrated_inputs[r_i])
-        print(self.calibrated_speeds[r_i])
+        #print(self.calibrated_inputs[l_i])
+        #print(self.calibrated_speeds[l_i])
+        #print(self.calibrated_inputs[r_i])
+        #print(self.calibrated_speeds[r_i])
         self.pwm.set_pwm(self.LSERVO, 0, math.floor(self.calibrated_inputs[l_i] / 20 * 4096));
         self.pwm.set_pwm(self.RSERVO, 0, math.floor(self.calibrated_inputs[r_i] / 20 * 4096));
 
 
     def setSpeedsIPS(self, L, R):
-        self.setSpeedsRPS((L/(2.5*math.pi)), (R/(2.5*math.pi)))
+        self.setSpeedsRPS((L/(2.625*math.pi)), (R/(2.625*math.pi)))
 
     #linear search, returns closest index
     # 0 for ascending list, 1 for descending list
@@ -184,11 +187,16 @@ class Encoder():
 
     # Set speed based on velocity v and angular velocity w
     def setSpeedsvw(self, v, w):
-        R = v / w
-        d_mid = 3.95 / 2
+        R = abs(v) / w
+        d_mid = 4.125 / 2
         # VL = w (R+dmid)
         # VR = w (R-dmid)
-        self.setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
+        if v > 0:
+            self.setSpeedsIPS(w * (R - d_mid), w * (R + d_mid))
+        elif v < 0:
+            self.setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
+        else:
+            self.stop()
 
 ## Main program
 if __name__ == "__main__":
