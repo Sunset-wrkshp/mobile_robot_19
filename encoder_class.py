@@ -15,7 +15,7 @@ class Encoder():
     RENCODER = 18
     WDIAMETER = 2.625
     WSEPARATION = 4.125
-    
+
     calibrated_inputs = [1.4,1.41,1.42,1.43,1.44,1.45,1.46,1.47,1.48,1.49,1.5,1.51,1.52,1.53,1.54,1.55,1.56,1.57,1.58,1.59,1.6]
     calibrated_speeds = []
     last_tick_time = [time.monotonic(), time.monotonic()]
@@ -69,7 +69,7 @@ class Encoder():
         self.step_count = (self.step_count[0], self.step_count[1]+1)
         self.prev_tick_time[1] = self.last_tick_time[1]
         self.last_tick_time[1] = time.monotonic()
-    
+
     # Just stops the robot
     def stop(self):
         self.pwm.set_pwm(self.RSERVO, 0, 0)
