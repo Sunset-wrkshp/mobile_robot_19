@@ -131,23 +131,45 @@ class Encoder():
 
 
     def setSpeedsRPS(self, L, R):
+        """Sets the speed of the robot's wheels to L and R rotations per second"""
         l_i = self.find_index(L, self.calibrated_speeds, 0)
         r_i = self.find_index(R, self.calibrated_speeds, 1)
-        print(self.calibrated_inputs[l_i])
-        print(self.calibrated_speeds[l_i])
-        print(self.calibrated_inputs[r_i])
-        print(self.calibrated_speeds[r_i])
-        self.pwm.set_pwm(self.LSERVO, 0, math.floor(self.calibrated_inputs[l_i] / 20 * 4096));
-        self.pwm.set_pwm(self.RSERVO, 0, math.floor(self.calibrated_inputs[r_i] / 20 * 4096));
+        if(isinstance(l_i, tuple)):
+            l_ms = inter(self.calibrated_speeds[l_i[0]], self.calibrated_inputs[l_i[0]],
+                          self.calibrated_speeds[l_i[1]], self.calibrated_inputs[l_i[1]], L )
+        else:
+            l_ms = self.calibrated_inputs[l_i]
+        if(isinstance(r_i, tuple)):
+            r_ms = inter(self.calibrated_speeds[r_i[0]], self.calibrated_inputs[r_i[0]],
+                          self.calibrated_speeds[r_i[1]], self.calibrated_inputs[r_i[1]], R )
+        else:
+            r_ms = self.calibrated_inputs[r_i]
+        # input ms to motors
+        print("L Indexes {0}: ms {1}".format(l_i, l_ms))
+        print("R Indexes {0}: ms {1}".format(r_i, r_ms))
+        self.pwm.set_pwm(self.LSERVO, 0, math.floor(l_ms / 20 * 4096));
+        self.pwm.set_pwm(self.RSERVO, 0, math.floor(r_ms / 20 * 4096));
 
 
     def setSpeedsIPS(self, L, R):
+        """Set the speed of the robot's wheels to L and R inches per second."""
         self.setSpeedsRPS((L/(2.5*math.pi)), (R/(2.5*math.pi)))
 
-    #linear search, returns closest index
-    # 0 for ascending list, 1 for descending list
-    #FIX does not return anything for values out of range.
     def find_index(self, num, data, dir):
+        """Search calibrated_speeds list for num. Return index
+
+        Performs a linear search on data for num. If num is found, returns the
+        index of num. If num is beyond the scope of data (max/min), returns the
+        last or first index respectively. If num is not found, returns a tuple
+        of the indexes of the numbers before and after in data.
+
+        Keyword Arguments:
+        num -- Number to search for in data
+        data -- calibrated_speeds list
+        dir -- 0 for ascending sort data list, 1 for descending sort data list
+        """
+        # What happens if the RPS entered is beyond the base capabilities?
+        # What happens if the number entered is on the left side of data?
           i = 0
           last = 0
           cur = 0
@@ -156,30 +178,22 @@ class Encoder():
               if data[i][0] == num:
                   return i
               elif data[i][0] < num:
-                  last = i
                   i+=1
               elif data[i][0] > num:
                   last = i-1
                   cur = i
-                  if (abs(num - data[last][0]) < abs(num - data[cur][0])):
-                      return last
-                  else:
-                      return cur
+                  return (last, cur)
             return len(data) - 1
           else:
             while(i < len(data)):
                 if data[i][1] == num:
                     return i
                 elif data[i][1] > num:
-                    last = i
                     i+=1
                 elif data[i][1] < num:
                     last = i-1
                     cur = i
-                    if (abs(num - data[last][1]) < abs(num - data[cur][1])):
-                        return last
-                    else:
-                        return cur
+                    return (last, cur)
             return len(data) - 1
 
     # Set speed based on velocity v and angular velocity w
@@ -189,6 +203,10 @@ class Encoder():
         # VL = w (R+dmid)
         # VR = w (R-dmid)
         self.setSpeedsIPS(w * (R + d_mid), w * (R - d_mid))
+
+    def inter(self, x1, y1, x2, y2, num):
+        """Return the linear interpolation of (x1,y1) and (x2,y2) for num"""
+        return ((num - x1)*(y2-y1))/(x2-x1) + y1
 
 ## Main program
 if __name__ == "__main__":
