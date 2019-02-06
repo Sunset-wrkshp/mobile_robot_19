@@ -37,55 +37,54 @@ if __name__ == "__main__":
     robot.stop()
     robot.calibrating = True
     robot.calibrateSpeeds()
-    #robot.calibrating = False
+    robot.calibrating = False
     robot.stop()
 
-    robot.setSpeedsvw(1, math.pi)
-    time.sleep(10)
-    robot.stop()
-    time.sleep(1)
-    robot.setSpeedsvw(-1, math.pi)
-    time.sleep(10)
-    robot.stop()
-"""
-    R1 = float(input("input R1: "))
-    R2 = float(input("input R2: "))
-    num_seconds = float(input("input time in seconds: "))
+    loop = "Y"
+    while (loop == "Y"):
+        R1 = float(input("input R1: "))
+        R2 = float(input("input R2: "))
+        num_seconds = float(input("input time in seconds: "))
 
-    # rotations = distance / wheel circumference
-    # rotations = ((R1+R2) * math.pi) / (2.5*math.pi)
-    rotations = (R1 + R2) / 2.5
+        # rotations = distance / wheel circumference
+        # rotations = ((R1+R2) * math.pi) / (2.625*math.pi)
+        rotations = (R1 + R2) / 2.625
+    
+        if num_seconds <= 0:
+            print("Time must be positive")
+        elif (R1 < 0) or (R2 < 0):
+            print("R1 and R2 must be non-negative")
+        elif ((rotations / num_seconds > robot.calibrated_speeds[0][1]) or 
+                (rotations / num_seconds > robot.calibrated_speeds[-1][0])):
+            print("Cannot travel " + str(((R1 + R2) * math.pi)) + " inches in " + str(num_seconds) + " seconds.")
+        else:
+            # Split the time evenly so that the robot is traveling at close to a constant speed
+            num_seconds_R1 = (R1 / (R1 + R2)) * num_seconds
+            num_seconds_R2 = (R2 / (R1 + R2)) * num_seconds
 
-    if num_seconds <= 0:
-        print("Time must be positive")
-    elif (R1 < 0) or (R2 < 0):
-        print("R1 and R2 must be non-negative")
-    elif ((rotations / num_seconds > robot.calibrated_speeds[0][1]) or
-            (rotations / num_seconds > robot.calibrated_speeds[-1][0])):
-        print("Cannot travel " + str(((R1 + R2) * math.pi)) + " inches in " + str(num_seconds) + " seconds.")
-    else:
-        # Split the time evenly so that the robot is traveling at close to a constant speed
-        num_seconds_R1 = (R1 / (R1 + R2)) * num_seconds
-        num_seconds_R2 = (R2 / (R1 + R2)) * num_seconds
+            # distance between wheels = 4.125
+            # 1/2 distance between wheels = 2.0625
+            right_rotations_R1 = (R1 - 2.0625) / 2.625
+            left_rotations_R1 = (R1 + 2.0625) / 2.625
+            right_rotations_R2 = (R2 + 2.0625) / 2.625
+            left_rotations_R2 = (R2 - 2.0625) / 2.625
+        
+            robot.ticks_left_R = int(right_rotations_R1 * 32)
+            robot.ticks_left_L = int(left_rotations_R1 * 32)
 
-        # 1/2 distance between wheels = 1.975
-        right_rotations_R1 = (R1 - 1.975) / 2.5
-        left_rotations_R1 = (R1 + 1.975) / 2.5
-        right_rotations_R2 = (R2 + 1.975) / 2.5
-        left_rotations_R2 = (R2 - 1.975) / 2.5
+            robot.setSpeedsvw((-R1 * math.pi) / num_seconds_R1, math.pi / num_seconds_R1)
 
-        robot.ticks_left_R = int(left_rotations_R1 * 32)
-        robot.ticks_left_L = int(right_rotations_R1 * 32)
+            input("Please wait for the robot to finish R1, then press enter")
 
-        robot.setSpeedsvw((-R1 * math.pi) / num_seconds_R1, math.pi / num_seconds_R1)
+            while (robot.ticks_left_R > 0) or (robot.ticks_left_L > 0):
+                input("Please wait for the robot to finish")
 
-        input("Please wait for the robot to finish R1, then press enter")
+            robot.ticks_left_R = int(right_rotations_R2 * 32)
+            robot.ticks_left_L = int(left_rotations_R2 * 32)
 
-        while (robot.ticks_left_R > 0) or (robot.ticks_left_L > 0):
-            input("Please wait for the robot to finish")
-
-        robot.ticks_left_R = int(left_rotations_R2 * 32)
-        robot.ticks_left_L = int(right_rotations_R2 * 32)
-
-        robot.setSpeedsvw((R2 * math.pi) / num_seconds_R2, math.pi / num_seconds_R2)
-"""
+            robot.setSpeedsvw((R2 * math.pi) / num_seconds_R2, math.pi / num_seconds_R2)
+            loop = input("Please wait for the robot to finish. Enter 'Y' to continue: ")
+            
+            while (robot.ticks_left_R > 0) or (robot.ticks_left_L > 0):
+                loop = input("Please wait for the robot to finish. Enter 'Y' to continue: ")
+            loop = loop.upper()

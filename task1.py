@@ -9,18 +9,23 @@ class Encoder_Task1(Encoder):
 
     def task1(self):
         self.calibrateSpeeds()
-        self.setSpeeds(0, 10)
+        self.setSpeeds(0, 100)
         time.sleep(1)
         speeds = []
 
+        # Get the speed of the wheel every 0.03s for 10s
         for i in range(334):
             speeds.append(self.getSpeeds()[1])
             time.sleep(0.03)
-
-        x_axis = np.arange(0.0, 10.02, 0.03)
-        plt.plot(x_axis, speeds)
-        plt.show()
         self.stop()
+
+        # Construct and show graph
+        x_axis = np.arange(0.0, 10.02, 0.03)
+        plt.plot(x_axis, speeds, 'b-', x_axis, speeds, 'x')
+        plt.suptitle("Right Wheel at 100 RPM")
+        plt.ylabel("Speed (RPS)")
+        plt.xlabel("Time (seconds)")
+        plt.show()
 
 ## Main program
 if __name__ == "__main__":
