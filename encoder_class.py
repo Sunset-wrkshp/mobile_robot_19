@@ -168,8 +168,8 @@ class Encoder():
         data -- calibrated_speeds list
         dir -- 0 for ascending sort data list, 1 for descending sort data list
         """
-        # What happens if the RPS entered is beyond the base capabilities?
-        # BUG What happens if the number entered is on the left side of data?
+        # BUG Needs to either throw exception or indicate None if number is beyond
+        # the scope (min/max) of calibrated_speeds
           i = 0
           last = 0
           cur = 0
