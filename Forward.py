@@ -39,21 +39,29 @@ if __name__ == "__main__":
     robot.calibrateSpeeds()
     robot.calibrating = False
     robot.stop()
+    
+    loop = "Y"
+    while (loop == "Y"):
+        dist = float(input("input distance in inches: "))
+        num_seconds = float(input("input time in seconds: "))
+        # rotations = distance / wheel circumference
+        rotations = dist / (robot.WDIAMETER*math.pi)
 
-    dist = float(input("input distance in inches: "))
-    num_seconds = float(input("input time in seconds: "))
-    # rotations = distance / wheel circumference
-    rotations = dist / (2.5*math.pi)
+        if num_seconds <= 0:
+            print("Time must be positive")
+        elif dist < 0:
+            print("Distance must be positive")
+        elif ((rotations / num_seconds > robot.calibrated_speeds[0][1]) or 
+                (rotations / num_seconds > robot.calibrated_speeds[-1][0])):
+            print("Cannot travel " + str(dist) + " inches in " + str(num_seconds) + " seconds.")
+        elif dist > 0:
+            robot.ticks_left_L = int(rotations * 32)
+            robot.ticks_left_R = int(rotations * 32)
 
-    if num_seconds <= 0:
-        print("Time must be positive")
-    elif dist < 0:
-        print("Distance must be positive")
-    elif ((rotations / num_seconds > robot.calibrated_speeds[0][1]) or
-            (rotations / num_seconds > robot.calibrated_speeds[-1][0])):
-        print("Cannot travel " + str(dist) + " inches in " + str(num_seconds) + " seconds.")
-    elif dist > 0:
-        robot.ticks_left_L = int(rotations * 32)
-        robot.ticks_left_R = int(rotations * 32)
-        print("rotations / sec: " + str(rotations / num_seconds))
-        robot.setSpeedsRPS(rotations / num_seconds, rotations / num_seconds)
+            robot.setSpeedsRPS(rotations / num_seconds, rotations / num_seconds)
+
+            loop = input("Please wait for the robot to finish. Enter 'Y' to continue: ")
+            
+            while (robot.ticks_left_R > 0) or (robot.ticks_left_L > 0):
+                loop = input("Please wait for the robot to finish. Enter 'Y' to continue: ")
+            loop = loop.upper()
