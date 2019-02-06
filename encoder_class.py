@@ -170,21 +170,21 @@ class Encoder():
         """
         # BUG Needs to either throw exception or indicate None if number is beyond
         # the scope (min/max) of calibrated_speeds
-          i = 0
-          last = 0
-          cur = 0
-          if dir == 0:
+        i = 0
+        last = 0
+        cur = 0
+        if dir == 0:
             while(i < len(data)):
-              if data[i][0] == num:
-                  return i
-              elif data[i][0] < num:
-                  i+=1
-              elif data[i][0] > num:
-                  last = i-1
-                  cur = i
-                  return (last, cur)
-            return len(data) - 1
-          else:
+                if data[i][0] == num:
+                    return i
+                elif data[i][0] < num:
+                    i+=1
+                elif data[i][0] > num:
+                    last = i-1
+                    cur = i
+                    return (last, cur)
+                return len(data) - 1
+        else:
             while(i < len(data)):
                 if data[i][1] == num:
                     return i
