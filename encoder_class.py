@@ -135,13 +135,13 @@ class Encoder():
         l_i = self.find_index(L, self.calibrated_speeds, 0)
         r_i = self.find_index(R, self.calibrated_speeds, 1)
         if(isinstance(l_i, tuple)):
-            l_ms = inter(self.calibrated_speeds[l_i[0]], self.calibrated_inputs[l_i[0]],
-                          self.calibrated_speeds[l_i[1]], self.calibrated_inputs[l_i[1]], L )
+            l_ms = inter( self.calibrated_speeds[l_i[0]][0], self.calibrated_inputs[l_i[0]],
+                          self.calibrated_speeds[l_i[1]][0], self.calibrated_inputs[l_i[1]], L )
         else:
             l_ms = self.calibrated_inputs[l_i]
         if(isinstance(r_i, tuple)):
-            r_ms = inter(self.calibrated_speeds[r_i[0]], self.calibrated_inputs[r_i[0]],
-                          self.calibrated_speeds[r_i[1]], self.calibrated_inputs[r_i[1]], R )
+            r_ms = inter( self.calibrated_speeds[r_i[0]][1], self.calibrated_inputs[r_i[0]],
+                          self.calibrated_speeds[r_i[1]][1], self.calibrated_inputs[r_i[1]], R )
         else:
             r_ms = self.calibrated_inputs[r_i]
         # input ms to motors
@@ -169,7 +169,7 @@ class Encoder():
         dir -- 0 for ascending sort data list, 1 for descending sort data list
         """
         # What happens if the RPS entered is beyond the base capabilities?
-        # What happens if the number entered is on the left side of data?
+        # BUG What happens if the number entered is on the left side of data?
           i = 0
           last = 0
           cur = 0
@@ -206,7 +206,8 @@ class Encoder():
 
     def inter(self, x1, y1, x2, y2, num):
         """Return the linear interpolation of (x1,y1) and (x2,y2) for num"""
-        return ((num - x1)*(y2-y1))/(x2-x1) + y1
+        print("interpolating ({0},{1}) ({2},{3}) looking for: {4}".format(x1,y1,x2,y2,num))
+        return float(((num - x1)*(y2-y1))/(x2-x1) + y1)
 
 ## Main program
 if __name__ == "__main__":
