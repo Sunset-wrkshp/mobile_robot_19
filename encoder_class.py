@@ -15,7 +15,7 @@ class Encoder():
     RENCODER = 18
     WDIAMETER = 2.625
     WSEPARATION = 4.125
-    
+
     calibrated_inputs = [1.4,1.41,1.42,1.43,1.44,1.45,1.46,1.47,1.48,1.49,1.5,1.51,1.52,1.53,1.54,1.55,1.56,1.57,1.58,1.59,1.6]
     calibrated_speeds = []
     last_tick_time = [time.monotonic(), time.monotonic()]
@@ -69,7 +69,7 @@ class Encoder():
         self.step_count = (self.step_count[0], self.step_count[1]+1)
         self.prev_tick_time[1] = self.last_tick_time[1]
         self.last_tick_time[1] = time.monotonic()
-    
+
     # Just stops the robot
     def stop(self):
         self.pwm.set_pwm(self.RSERVO, 0, 0)
@@ -80,6 +80,7 @@ class Encoder():
     def ctrlC(self, signum, frame):
         print("Exiting")
         GPIO.cleanup()
+        self.stop()
         exit()
 
     # Initalizes Encoders
@@ -136,12 +137,21 @@ class Encoder():
     def setSpeedsRPS(self, L, R):
         l_i = self.find_index(L, self.calibrated_speeds, 0)
         r_i = self.find_index(R, self.calibrated_speeds, 1)
-        #print(self.calibrated_inputs[l_i])
-        #print(self.calibrated_speeds[l_i])
-        #print(self.calibrated_inputs[r_i])
-        #print(self.calibrated_speeds[r_i])
-        self.pwm.set_pwm(self.LSERVO, 0, math.floor(self.calibrated_inputs[l_i] / 20 * 4096));
-        self.pwm.set_pwm(self.RSERVO, 0, math.floor(self.calibrated_inputs[r_i] / 20 * 4096));
+        if(isinstance(l_i, tuple)):
+            l_ms = self.inter( self.calibrated_speeds[l_i[0]][0], self.calibrated_inputs[l_i[0]],
+                          self.calibrated_speeds[l_i[1]][0], self.calibrated_inputs[l_i[1]], L )
+        else:
+            l_ms = self.calibrated_inputs[l_i]
+        if(isinstance(r_i, tuple)):
+            r_ms = self.inter( self.calibrated_speeds[r_i[0]][1], self.calibrated_inputs[r_i[0]],
+                          self.calibrated_speeds[r_i[1]][1], self.calibrated_inputs[r_i[1]], R )
+        else:
+            r_ms = self.calibrated_inputs[r_i]
+        # input ms to motors
+        print("L Indexes {0}: ms {1}".format(l_i, l_ms))
+        print("R Indexes {0}: ms {1}".format(r_i, r_ms))
+        self.pwm.set_pwm(self.LSERVO, 0, math.floor(l_ms / 20 * 4096));
+        self.pwm.set_pwm(self.RSERVO, 0, math.floor(r_ms / 20 * 4096));
 
 
     def setSpeedsIPS(self, L, R):
@@ -151,25 +161,35 @@ class Encoder():
     # 0 for ascending list, 1 for descending list
     #FIX does not return anything for values out of range.
     def find_index(self, num, data, dir):
-          i = 0
-          last = 0
-          cur = 0
-          if dir == 0:
+        """Search calibrated_speeds list for num. Return index
+
+        Performs a linear search on data for num. If num is found, returns the
+        index of num. If num is beyond the scope of data (max/min), returns the
+        last or first index respectively. If num is not found, returns a tuple
+        of the indexes of the numbers before and after in data.
+
+        Keyword Arguments:
+        num -- Number to search for in data
+        data -- calibrated_speeds list
+        dir -- 0 for ascending sort data list, 1 for descending sort data list
+        """
+        # BUG Needs to either throw exception or indicate None if number is beyond
+        # the scope (min/max) of calibrated_speeds
+        i = 0
+        last = 0
+        cur = 0
+        if dir == 0:
             while(i < len(data)):
-              if data[i][0] == num:
-                  return i
-              elif data[i][0] < num:
-                  last = i
-                  i+=1
-              elif data[i][0] > num:
-                  last = i-1
-                  cur = i
-                  if (abs(num - data[last][0]) < abs(num - data[cur][0])):
-                      return last
-                  else:
-                      return cur
-            return len(data) - 1
-          else:
+                if data[i][0] == num:
+                    return i
+                elif data[i][0] < num:
+                    i+=1
+                elif data[i][0] > num:
+                    last = i-1
+                    cur = i
+                    return (last, cur)
+                return len(data) - 1
+        else:
             while(i < len(data)):
                 if data[i][1] == num:
                     return i
@@ -191,6 +211,7 @@ class Encoder():
         d_mid = 4.125 / 2
         # VL = w (R+dmid)
         # VR = w (R-dmid)
+
         if v > 0:
             self.setSpeedsIPS(w * (R - d_mid), w * (R + d_mid))
         elif v < 0:
@@ -198,45 +219,49 @@ class Encoder():
         else:
             self.stop()
 
+    def inter(self, x1, y1, x2, y2, num):
+        """Return the linear interpolation of (x1,y1) and (x2,y2) for num"""
+        print("interpolating ({0},{1}) ({2},{3}) looking for: {4}".format(x1,y1,x2,y2,num))
+        return float(((num - x1)*(y2-y1))/(x2-x1) + y1)
 ## Main program
 if __name__ == "__main__":
 
     d = Encoder()
     while(1):
         time.sleep(1)
-        # d.getCounts()
         d.calibrateSpeeds()
         print(d.calibrated_speeds)
 
         time.sleep(5)
         print("set speed")
-        test = 1
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
+        test = .2
+        print("testing RPS: {test}".format(test = test))
+        d.setSpeedsRPS(test, test)
         time.sleep(3)
         d.setSpeedsRPS(0,0)
         time.sleep(2)
-
-        test = .5
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
-        time.sleep(3)
-        d.setSpeedsRPS(0,0)
-        time.sleep(2)
-
-        test = 4
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
-        time.sleep(3)
-        d.setSpeedsRPS(0,0)
-        time.sleep(2)
-
-        test = 10
-        print("testing inches: {test}".format(test = test))
-        d.setSpeedsIPS(test, test)
-        time.sleep(3)
-        d.setSpeedsRPS(0,0)
-        time.sleep(2)
+        d.stop()
+        #
+        # test = -.6
+        # print("testing RPS: {test}".format(test = test))
+        # d.setSpeedsRPS(test, test)
+        # time.sleep(3)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        #
+        # test = .75
+        # print("testing RPS: {test}".format(test = test))
+        # d.setSpeedsRPS(test, test)
+        # time.sleep(3)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
+        #
+        # test = -.63
+        # print("testing RPS: {test}".format(test = test))
+        # d.setSpeedsRPS(test, test)
+        # time.sleep(3)
+        # d.setSpeedsRPS(0,0)
+        # time.sleep(2)
         # test = .4
         # print("Testing speeds {test}, {test}".format(test = test))
         # d.setSpeedsRPS(test,test)
