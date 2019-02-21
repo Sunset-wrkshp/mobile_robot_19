@@ -79,6 +79,7 @@ class Encoder():
     # It's intended for properly exiting the program.
     def ctrlC(self, signum, frame):
         print("Exiting")
+        self.stop()
         GPIO.cleanup()
         exit()
 
