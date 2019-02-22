@@ -1,0 +1,11 @@
+## 2019-02-20
+### Added
+- Added wallDistance.py, which will be used for task 2
+- Added tof_sensor_class.py, which initializes the tof sensors and includes some funtions for returning data
+- Added robot_class.py, which will act as a wrapper class for all the components of the robot
+- Added functions to return the max forward and backward speeds in inches to encoder_class.py
+
+### Changed
+- Reduced number of calibration tests
+- Increased calibration time
+- Calibration is now an average speed instead of intantaneous
