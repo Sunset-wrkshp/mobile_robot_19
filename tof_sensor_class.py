@@ -55,11 +55,11 @@ class DistanceSensor():
         self.fSensor.start_ranging(VL53L0X.VL53L0X_GOOD_ACCURACY_MODE)
 
         # Returns sensor input conveted from mm to inches
-        def get_front_inches(self):
-            return self.fSensor.get_distance() / 25.4
+    def get_front_inches(self):
+        return self.fSensor.get_distance() / 25.4
 
-        def get_left_inches(self):
-            return self.lSensor.get_distance() / 25.4
+    def get_left_inches(self):
+        return self.lSensor.get_distance() / 25.4
 
-        def get_right_inches(self):
-            return self.rSensor.get_distance() / 25.4
+    def get_right_inches(self):
+        return self.rSensor.get_distance() / 25.4

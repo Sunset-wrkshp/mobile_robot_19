@@ -54,6 +54,8 @@ if __name__ == "__main__":
         elif ((rotations / num_seconds > robot.calibrated_speeds[0][1]) or 
                 (rotations / num_seconds > robot.calibrated_speeds[-1][0])):
             print("Cannot travel " + str(dist) + " inches in " + str(num_seconds) + " seconds.")
+            print("Max left speed: " + str(robot.calibrated_speeds[0][1]))
+            print("Max right speed: " + str(robot.calibrated_speeds[-1][0]))
         elif dist > 0:
             robot.ticks_left_L = int(rotations * 32)
             robot.ticks_left_R = int(rotations * 32)

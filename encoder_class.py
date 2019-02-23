@@ -126,11 +126,11 @@ class Encoder():
             self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
             # Give the wheels 0.3 seconds to adjust to the speed            
             time.sleep(0.3)
-            first_time = self.last_tick_time
+            first_time = (self.last_tick_time[0], self.last_tick_time[1])
             steps = self.step_count
             # Wait 5 seconds before measuring the average speed
             time.sleep(5)
-            mesured_speed = []
+            measured_speed = []
 
             # Measure the speed of the left wheel
             if (self.last_tick_time[0] == first_time[0]):
@@ -171,11 +171,11 @@ class Encoder():
         else:
             r_ms = self.calibrated_inputs[r_i]
         # input ms to motors
-        print("L Indexes {0}: ms {1}".format(l_i, l_ms))
-        print("R Indexes {0}: ms {1}".format(r_i, r_ms))
+        #print("L Indexes {0}: ms {1}".format(l_i, l_ms))
+        #print("R Indexes {0}: ms {1}".format(r_i, r_ms))
         self.pwm.set_pwm(self.LSERVO, 0, math.floor(l_ms / 20 * 4096));
         self.pwm.set_pwm(self.RSERVO, 0, math.floor(r_ms / 20 * 4096));
-        print("Speed set to {0}ms and {1}ms".format(l_ms, r_ms))
+        #print("Speed set to {0}ms and {1}ms".format(l_ms, r_ms))
         return True
 
 
@@ -228,7 +228,7 @@ class Encoder():
 
     def inter(self, x1, y1, x2, y2, num):
         """Return the linear interpolation of (x1,y1) and (x2,y2) for num"""
-        print("interpolating ({0},{1}) ({2},{3}) looking for: {4}".format(x1,y1,x2,y2,num))
+        #print("interpolating ({0},{1}) ({2},{3}) looking for: {4}".format(x1,y1,x2,y2,num))
         return float(((num - x1)*(y2-y1))/(x2-x1) + y1)
 
     # Set speed based on velocity v and angular velocity w
@@ -247,10 +247,10 @@ class Encoder():
     # Returns the max speed of the robot in inches/second
     # This assumes that the robot can only move as fast as its slowest wheel
     def get_max_forward_speed(self):
-        return min(self.calibrated_speeds[-1][0] * WDIAMETER * math.pi, self.calibrated_speeds[1][1] * WDIAMETER * math.pi)
+        return min(self.calibrated_speeds[-1][0] * self.WDIAMETER * math.pi, self.calibrated_speeds[1][1] * self.WDIAMETER * math.pi)
 
     def get_max_backward_speed(self):
-        return max(self.calibrated_speeds[1][0] * WDIAMETER * math.pi, self.calibrated_speeds[-1][1] * WDIAMETER * math.pi)
+        return max(self.calibrated_speeds[1][0] * self.WDIAMETER * math.pi, self.calibrated_speeds[-1][1] * self.WDIAMETER * math.pi)
 
 ## Main program
 if __name__ == "__main__":
