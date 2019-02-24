@@ -7,7 +7,7 @@ def get_calib():
 
 def set_calib(data):
     with open("calibration.txt", "w") as f:
-        json.dump(data, f)
+        f.write(json.dumps(data, indent=4))
     #check if the file wrote correctly
     # if os.stat("calibration.txt").st_size != 0:
     #     return True
