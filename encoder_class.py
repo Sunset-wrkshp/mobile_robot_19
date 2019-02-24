@@ -8,8 +8,11 @@ import RPi.GPIO as GPIO
 import signal
 import Adafruit_PCA9685
 import math
+import calib_io as calib
 
 class Encoder():
+    TESTING = True
+    TEST_WRITE = True
     step_count = ()
     LENCODER = 17
     RENCODER = 18
@@ -120,40 +123,47 @@ class Encoder():
 
     # Creates a mapping from the servo input to the wheel speed
     def calibrateSpeeds(self):
-        speeds = []
-        for i in self.calibrated_inputs:
-            self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
-            self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
-            # Give the wheels 0.3 seconds to adjust to the speed            
-            time.sleep(0.3)
-            first_time = (self.last_tick_time[0], self.last_tick_time[1])
-            steps = self.step_count
-            # Wait 5 seconds before measuring the average speed
-            time.sleep(5)
-            measured_speed = []
+        if self.TESTING and not self.TEST_WRITE:
+            self.calibrated_speeds = calib.get_calib()
+        else:
+            speeds = []
+            for i in self.calibrated_inputs:
+                self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
+                self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
+                # Give the wheels 0.3 seconds to adjust to the speed
+                time.sleep(0.3)
+                first_time = (self.last_tick_time[0], self.last_tick_time[1])
+                steps = self.step_count
+                # Wait 5 seconds before measuring the average speed
+                time.sleep(5)
+                measured_speed = []
 
-            # Measure the speed of the left wheel
-            if (self.last_tick_time[0] == first_time[0]):
-                measured_speed.append(0)
-            else:
-                measured_speed.append(((self.step_count[0] - steps[0]) / 32.0) /
-                                        (self.last_tick_time[0] - first_time[0]))
+                # Measure the speed of the left wheel
+                if (self.last_tick_time[0] == first_time[0]):
+                    measured_speed.append(0)
+                else:
+                    measured_speed.append(((self.step_count[0] - steps[0]) / 32.0) /
+                                            (self.last_tick_time[0] - first_time[0]))
 
-            # measure the speed of the right wheel
-            if (self.last_tick_time[1] == first_time[1]):
-                measured_speed.append(0)
-            else:
-                measured_speed.append(((self.step_count[1] - steps[1]) / 32.0) /
-                                        (self.last_tick_time[1] - first_time[1]))
+                # measure the speed of the right wheel
+                if (self.last_tick_time[1] == first_time[1]):
+                    measured_speed.append(0)
+                else:
+                    measured_speed.append(((self.step_count[1] - steps[1]) / 32.0) /
+                                            (self.last_tick_time[1] - first_time[1]))
 
-            # Left wheel is going backwards if pwm < 1.5, otherwise the right wheel is going backwards
-            if (i < 1.5):
-                speeds.append((-measured_speed[0], measured_speed[1]))
-            else:
-                speeds.append((measured_speed[0], -measured_speed[1]))
-        self.pwm.set_pwm(self.RSERVO, 0, 0)
-        self.pwm.set_pwm(self.LSERVO, 0, 0)
-        self.calibrated_speeds = speeds
+                # Left wheel is going backwards if pwm < 1.5, otherwise the right wheel is going backwards
+                if (i < 1.5):
+                    speeds.append((-measured_speed[0], measured_speed[1]))
+                else:
+                    speeds.append((measured_speed[0], -measured_speed[1]))
+            self.pwm.set_pwm(self.RSERVO, 0, 0)
+            self.pwm.set_pwm(self.LSERVO, 0, 0)
+            if self.TESTING and self.TEST_WRITE:
+                calib.set_calib(speeds)
+            self.calibrated_speeds = speeds
+        #For TESTING
+        print(self.calibrated_speeds)
 
 
     def setSpeedsRPS(self, L, R):
