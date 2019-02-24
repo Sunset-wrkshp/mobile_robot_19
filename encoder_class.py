@@ -160,7 +160,7 @@ class Encoder():
             self.pwm.set_pwm(self.RSERVO, 0, 0)
             self.pwm.set_pwm(self.LSERVO, 0, 0)
             if self.TESTING and self.TEST_WRITE:
-                calib_io.set_calib(speeds)
+                calib.set_calib(speeds)
             self.calibrated_speeds = speeds
         #For TESTING
         print(self.calibrated_speeds)

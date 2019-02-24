@@ -16,6 +16,8 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
         return 0
 
 rob = Robot()
+max_forward = rob.encoder.get_max_forward_speed()
+max_backward = rob.encoder.get_max_backward_speed()
 
 desired_distance = 5
 # Proportional gain
@@ -27,29 +29,31 @@ while (True):
     #r_distance = min(rob.distance_sensor.get_right_inches(), rob.distance_sensor.get_front_inches())
     r_distance = rob.distance_sensor.get_right_inches()
     f_distance = rob.distance_sensor.get_front_inches()
-    if r_distance > 20:
-        rob.encoder.stop()
-    else:
-        r_proportional_control = saturation_function(Kp * (desired_distance - r_distance),
-                                                    rob.encoder.get_max_forward_speed(),
-                                                    rob.encoder.get_max_backward_speed())
-        f_proportional_control = saturation_function(Kp * ((desired_distance * 2) - f_distance),
-                                                    rob.encoder.get_max_forward_speed(),
-                                                    rob.encoder.get_max_backward_speed())
-        if f_proportional_control == 0:
-            f_proportional_control = 2 * rob.encoder.get_max_forward_speed()
-        else:
-            f_proportional_control = 1 / f_proportional_control
+
+    #if r_distance > 20:
+        #rob.encoder.stop()
+    #else:
+    r_proportional_control = saturation_function(Kp * (desired_distance - r_distance), max_forward, max_backward)
+    f_proportional_control = saturation_function(Kp * (desired_distance - min(f_distance, r_distance)), max_forward, max_backward)
+##        if f_proportional_control == 0:
+##            f_proportional_control = 2 * rob.encoder.get_max_forward_speed()
+##        else:
+##            f_proportional_control = 1 / f_proportional_control
         
 ##        if f_distance < desired_distance:
 ##            rob.encoder.setSpeedsIPS(0,rob.encoder.get_max_forward_speed())
 ##        else:
-        print("r distance: " + str(r_distance))
-        print("f distance: " + str(f_distance))
-        print("r sat:" + str(r_proportional_control))
-        print("f sat:" + str(f_proportional_control))
-        if r_distance > desired_distance:
-            rob.encoder.setSpeedsIPS(rob.encoder.get_max_forward_speed() - abs(f_proportional_control), rob.encoder.get_max_forward_speed() - abs(r_proportional_control))
-        else:
-            rob.encoder.setSpeedsIPS(rob.encoder.get_max_forward_speed() - abs(r_proportional_control) - abs(f_proportional_control), rob.encoder.get_max_forward_speed())
+##        print("r distance: " + str(r_distance))
+##        print("f distance: " + str(f_distance))
+##        print("r sat:" + str(r_proportional_control))
+##        print("f sat:" + str(f_proportional_control))
+    if f_distance < (desired_distance * 2):
+        rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control, max_forward), max_forward)
+    else:
+        rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward), 
+                                    min(max_forward - r_proportional_control, max_forward))
+##        if r_distance > desired_distance:
+##            rob.encoder.setSpeedsIPS(rob.encoder.get_max_forward_speed() - abs(f_proportional_control), rob.encoder.get_max_forward_speed() - abs(r_proportional_control))
+##        else:
+##            rob.encoder.setSpeedsIPS(rob.encoder.get_max_forward_speed() - abs(r_proportional_control) - abs(f_proportional_control), rob.encoder.get_max_forward_speed())
     time.sleep(0.01)
