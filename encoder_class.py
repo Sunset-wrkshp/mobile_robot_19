@@ -8,8 +8,11 @@ import RPi.GPIO as GPIO
 import signal
 import Adafruit_PCA9685
 import math
+import calib_io as calib
 
 class Encoder():
+    TESTING = True
+    TEST_WRITE = True
     step_count = ()
     LENCODER = 17
     RENCODER = 18
@@ -120,40 +123,47 @@ class Encoder():
 
     # Creates a mapping from the servo input to the wheel speed
     def calibrateSpeeds(self):
-        speeds = []
-        for i in self.calibrated_inputs:
-            self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
-            self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
-            # Give the wheels 0.3 seconds to adjust to the speed            
-            time.sleep(0.3)
-            first_time = self.last_tick_time
-            steps = self.step_count
-            # Wait 5 seconds before measuring the average speed
-            time.sleep(5)
-            mesured_speed = []
+        if self.TESTING and not self.TEST_WRITE:
+            self.calibrated_speeds = calib.get_calib()
+        else:
+            speeds = []
+            for i in self.calibrated_inputs:
+                self.pwm.set_pwm(self.RSERVO, 0, math.floor(i / 20 * 4096))
+                self.pwm.set_pwm(self.LSERVO, 0, math.floor(i / 20 * 4096))
+                # Give the wheels 0.3 seconds to adjust to the speed
+                time.sleep(0.3)
+                first_time = (self.last_tick_time[0], self.last_tick_time[1])
+                steps = self.step_count
+                # Wait 5 seconds before measuring the average speed
+                time.sleep(5)
+                measured_speed = []
 
-            # Measure the speed of the left wheel
-            if (self.last_tick_time[0] == first_time[0]):
-                measured_speed.append(0)
-            else:
-                measured_speed.append(((self.step_count[0] - steps[0]) / 32.0) /
-                                        (self.last_tick_time[0] - first_time[0]))
+                # Measure the speed of the left wheel
+                if (self.last_tick_time[0] == first_time[0]):
+                    measured_speed.append(0)
+                else:
+                    measured_speed.append(((self.step_count[0] - steps[0]) / 32.0) /
+                                            (self.last_tick_time[0] - first_time[0]))
 
-            # measure the speed of the right wheel
-            if (self.last_tick_time[1] == first_time[1]):
-                measured_speed.append(0)
-            else:
-                measured_speed.append(((self.step_count[1] - steps[1]) / 32.0) /
-                                        (self.last_tick_time[1] - first_time[1]))
+                # measure the speed of the right wheel
+                if (self.last_tick_time[1] == first_time[1]):
+                    measured_speed.append(0)
+                else:
+                    measured_speed.append(((self.step_count[1] - steps[1]) / 32.0) /
+                                            (self.last_tick_time[1] - first_time[1]))
 
-            # Left wheel is going backwards if pwm < 1.5, otherwise the right wheel is going backwards
-            if (i < 1.5):
-                speeds.append((-measured_speed[0], measured_speed[1]))
-            else:
-                speeds.append((measured_speed[0], -measured_speed[1]))
-        self.pwm.set_pwm(self.RSERVO, 0, 0)
-        self.pwm.set_pwm(self.LSERVO, 0, 0)
-        self.calibrated_speeds = speeds
+                # Left wheel is going backwards if pwm < 1.5, otherwise the right wheel is going backwards
+                if (i < 1.5):
+                    speeds.append((-measured_speed[0], measured_speed[1]))
+                else:
+                    speeds.append((measured_speed[0], -measured_speed[1]))
+            self.pwm.set_pwm(self.RSERVO, 0, 0)
+            self.pwm.set_pwm(self.LSERVO, 0, 0)
+            if self.TESTING and self.TEST_WRITE:
+                calib.set_calib(speeds)
+            self.calibrated_speeds = speeds
+        #For TESTING
+        print(self.calibrated_speeds)
 
 
     def setSpeedsRPS(self, L, R):
@@ -171,11 +181,11 @@ class Encoder():
         else:
             r_ms = self.calibrated_inputs[r_i]
         # input ms to motors
-        print("L Indexes {0}: ms {1}".format(l_i, l_ms))
-        print("R Indexes {0}: ms {1}".format(r_i, r_ms))
+        #print("L Indexes {0}: ms {1}".format(l_i, l_ms))
+        #print("R Indexes {0}: ms {1}".format(r_i, r_ms))
         self.pwm.set_pwm(self.LSERVO, 0, math.floor(l_ms / 20 * 4096));
         self.pwm.set_pwm(self.RSERVO, 0, math.floor(r_ms / 20 * 4096));
-        print("Speed set to {0}ms and {1}ms".format(l_ms, r_ms))
+        #print("Speed set to {0}ms and {1}ms".format(l_ms, r_ms))
         return True
 
 
@@ -228,7 +238,7 @@ class Encoder():
 
     def inter(self, x1, y1, x2, y2, num):
         """Return the linear interpolation of (x1,y1) and (x2,y2) for num"""
-        print("interpolating ({0},{1}) ({2},{3}) looking for: {4}".format(x1,y1,x2,y2,num))
+        #print("interpolating ({0},{1}) ({2},{3}) looking for: {4}".format(x1,y1,x2,y2,num))
         return float(((num - x1)*(y2-y1))/(x2-x1) + y1)
 
     # Set speed based on velocity v and angular velocity w
@@ -247,10 +257,10 @@ class Encoder():
     # Returns the max speed of the robot in inches/second
     # This assumes that the robot can only move as fast as its slowest wheel
     def get_max_forward_speed(self):
-        return min(self.calibrated_speeds[-1][0] * WDIAMETER * math.pi, self.calibrated_speeds[1][1] * WDIAMETER * math.pi)
+        return min(self.calibrated_speeds[-1][0] * self.WDIAMETER * math.pi, self.calibrated_speeds[1][1] * self.WDIAMETER * math.pi)
 
     def get_max_backward_speed(self):
-        return max(self.calibrated_speeds[1][0] * WDIAMETER * math.pi, self.calibrated_speeds[-1][1] * WDIAMETER * math.pi)
+        return max(self.calibrated_speeds[1][0] * self.WDIAMETER * math.pi, self.calibrated_speeds[-1][1] * self.WDIAMETER * math.pi)
 
 ## Main program
 if __name__ == "__main__":
