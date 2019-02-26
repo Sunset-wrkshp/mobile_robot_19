@@ -1,3 +1,13 @@
+## 2019-02-26
+### Added
+- Added follow_left() and follow_right() functions to straight_wall.py. follow_right() should be the same as before,
+	but follow_left should follow the wall to the left of the robot. follow_left() needs to be tested.
+
+### Changed
+- Added boolean input to main() in wallDistance.py. This determines if the robot approaches the wall perpetually
+	or if it stops after 60s and displays a plot of the distance over time.
+- Changed straight_wall.py to now follow the closest wall to either the robot's left or right. Needs testing
+
 ## 2019-02-20
 ### Added
 - Added wallDistance.py, which will be used for task 2
