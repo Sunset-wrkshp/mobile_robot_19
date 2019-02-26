@@ -1,7 +1,17 @@
 from robot_class import Robot
 import time as time
 
-def follow_right():
+def follow_right(rob):
+    rob = Robot()
+    max_forward = rob.encoder.get_max_forward_speed()
+    max_backward = rob.encoder.get_max_backward_speed()
+
+    desired_distance = 5
+    # Proportional gain
+    Kp = 1.5
+
+    user_input = input("Place robot beside wall and press enter to continue.")
+
     while (True):
         r_distance = rob.distance_sensor.get_right_inches()
         f_distance = rob.distance_sensor.get_front_inches()
@@ -19,7 +29,17 @@ def follow_right():
                                     min(max_forward - r_proportional_control, max_forward))
         time.sleep(0.01)
 
-def follow_left():
+def follow_left(rob):
+    rob = Robot()
+    max_forward = rob.encoder.get_max_forward_speed()
+    max_backward = rob.encoder.get_max_backward_speed()
+
+    desired_distance = 5
+    # Proportional gain
+    Kp = 1.5
+
+    user_input = input("Place robot beside wall and press enter to continue.")
+
     while (True):
         l_distance = rob.distance_sensor.get_left_inches()
         f_distance = rob.distance_sensor.get_front_inches()
@@ -53,19 +73,10 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
 
 def main():
     rob = Robot()
-    max_forward = rob.encoder.get_max_forward_speed()
-    max_backward = rob.encoder.get_max_backward_speed()
-
-    desired_distance = 5
-    # Proportional gain
-    Kp = 1.5
-
-    user_input = input("Place robot beside wall and press enter to continue.")
-
     if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
-        follow_right()
+        follow_right(rob)
     else:
-        follow_left()
+        follow_left(rob)
 
 ## Main program
 if __name__ == "__main__":
