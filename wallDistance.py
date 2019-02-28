@@ -30,26 +30,27 @@ def main(demonstrating):
     if demonstrating:
         while True:
             distance = rob.distance_sensor.get_front_inches()
-            proportional_control = saturation_function(Kp * (desired_distance - distance), 
-                                                        rob.encoder.get_max_forward_speed(), 
+            proportional_control = saturation_function(Kp * (desired_distance - distance),
+                                                        rob.encoder.get_max_forward_speed(),
                                                         rob.encoder.get_max_backward_speed())
             rob.encoder.setSpeedsIPS(proportional_control, proportional_control)
             time.sleep(0.01)
     else:
         start_time = time.monotonic()
         distance_list = []
-        while time.monotonic() < (start_time + 60):
+        x_axis = []
+        while time.monotonic() <= (start_time + 30):
             distance = rob.distance_sensor.get_front_inches()
-            proportional_control = saturation_function(Kp * (desired_distance - distance), 
-                                                        rob.encoder.get_max_forward_speed(), 
+            proportional_control = saturation_function(Kp * (desired_distance - distance),
+                                                        rob.encoder.get_max_forward_speed(),
                                                         rob.encoder.get_max_backward_speed())
             rob.encoder.setSpeedsIPS(proportional_control, proportional_control)
             distance_list.append(distance)
             time.sleep(0.01)
+            x_axis.append(time.monotonic() - start_time)
 
-        x_axis = np.arange(0.0, 60.0, 0.01)
         plt.plot(x_axis, distance_list)
-        plt.suptitle("Distance from wall over 60s")
+        plt.suptitle("Distance from wall over 30s with Kp ={0}".format(Kp))
         plt.ylabel("Distance (inches)")
         plt.xlabel("Time (seconds)")
         plt.show()
