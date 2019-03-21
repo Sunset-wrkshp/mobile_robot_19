@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+#Manual Additions
+/Task 1
+calibration.txt
