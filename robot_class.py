@@ -17,6 +17,6 @@ class Robot():
         self.camera.ctrlC()
         self.distance_sensor.ctrlC()
         exit()
-        
+
     def ctrlC(self, signum, frame):
         self.stop()

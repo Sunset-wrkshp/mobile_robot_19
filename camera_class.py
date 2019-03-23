@@ -90,5 +90,4 @@ class Camera():
     def ctrlC(self):
         print("Stopping camera")
         self.stop()
-        exit()
 
