@@ -8,3 +8,29 @@ class Robot():
         self.encoder.calibrateSpeeds()
         self.distance_sensor = DistanceSensor()
         self.camera = Camera()
+
+        self.GIF = None
+        self.no_wall = None
+        self.less_than_10cm = None
+        self.stop_range = None
+
+    #getters and setters
+    def goal_in_front(self, val = None):
+        if val is not None:
+            self.GIF = val
+        return self.GIF
+
+    def no_wall_detected(self, val = None):
+        if val is not None:
+            self.no_wall = val
+        return self.no_wall
+
+    def less_than_10cm(self, val = None):
+        if val is not None:
+            self.less_than_10cm = val
+        return self.less_than_10cm
+
+    def stop_range(self, val = None):
+        if val is not None:
+            self.stop_range = val
+        return self.stop_range
