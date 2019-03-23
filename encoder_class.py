@@ -11,7 +11,7 @@ import math
 import calib_io as calib
 
 class Encoder():
-    TESTING = False
+    TESTING = True
     TEST_WRITE = False
     step_count = ()
     LENCODER = 17
