@@ -1,6 +1,6 @@
-# This program demonstrates advanced usage of the OpenCV library by 
+# This program demonstrates advanced usage of the OpenCV library by
 # using the SimpleBlobDetector feature along with camera threading.
-# The program displays two windows: one for adjusting the mask, 
+# The program displays two windows: one for adjusting the mask,
 # and one that displays the detected blobs in the (masked) image.
 # Adjust the HSV values until blobs are detected from the camera feed.
 # There's also a params file in the same folder that can be adjusted.
@@ -63,7 +63,8 @@ class Camera():
         # Get a frame
         frame = self.camera.read()
 
-        # Blob detection works better in the HSV color space 
+        # Blob detection works better in the HSV color space
+
         # (than the RGB color space) so the frame is converted to HSV.
         frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
@@ -81,10 +82,13 @@ class Camera():
 
         return keypoints
 
+    # Just stops the robot
+    def stop(self):
+        self.camera.stop()
+
+
     def ctrlC(self):
         print("Stopping camera")
         self.stop()
+        exit()
 
-    # Stops the camera
-    def stop(self):
-        self.camera.stop()
