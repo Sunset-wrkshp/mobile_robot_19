@@ -29,6 +29,7 @@ def follow_right(rob):
                                     min(max_forward - r_proportional_control, max_forward))
         time.sleep(0.01)
 
+
 def follow_left(rob):
     #rob = Robot()
     max_forward = rob.encoder.get_max_forward_speed()
