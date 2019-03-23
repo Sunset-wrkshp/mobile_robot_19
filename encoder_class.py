@@ -34,7 +34,7 @@ class Encoder():
     def __init__(self):
         self.step_count = (0,0)
         # Attach the Ctrl+C signal interrupt
-        signal.signal(signal.SIGINT, self.ctrlC)
+        #signal.signal(signal.SIGINT, self.ctrlC)
 
         # Set the pin numbering scheme to the numbering shown on the robot itself.
         GPIO.setmode(GPIO.BCM)
@@ -81,11 +81,10 @@ class Encoder():
 
     # This function is called when Ctrl+C is pressed.
     # It's intended for properly exiting the program.
-    def ctrlC(self, signum, frame):
-        print("Exiting")
+    def ctrlC(self):
+        print("Exiting encoder class")
         self.stop()
         GPIO.cleanup()
-        exit()
 
     # Initalizes Encoders
     # Is this needed?

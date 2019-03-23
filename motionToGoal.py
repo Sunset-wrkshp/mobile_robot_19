@@ -3,17 +3,17 @@ import time as time
 import numpy as np
 import matplotlib.pyplot as plt
 
-def saturation_function(proportional_speed, max_forward_speed, max_backward_speed):
-    if proportional_speed > 0.1:
+def saturation_function(proportional_speed, max_forward_speed, max_backward_speed, error):
+    if proportional_speed < -error:
         if proportional_speed < max_backward_speed:
             return max_backward_speed
         else:
-            return proportional_speed
-    elif proportional_speed < -0.1:
+            return proportional_speed + error
+    elif proportional_speed > error:
         if proportional_speed > max_forward_speed:
             return max_forward_speed
         else:
-            return proportional_speed
+            return proportional_speed - error
     else:
         return 0
 
@@ -35,7 +35,7 @@ def main(demonstrating):
         while True:
             distance = rob.distance_sensor.get_front_inches()
             forward_control = saturation_function(sensor_Kp * (distance - desired_distance),
-                                                        max_forward, max_backward)
+                                                        max_forward, max_backward, 0.2)
             blobs = rob.camera.get_blobs()
 
             #Find largest blob
@@ -46,11 +46,15 @@ def main(demonstrating):
                     size = blobs[i].size
                     largest = i
 
-            sideways_control = saturation_function(camera_Kp * (blobs[i].pt[0] - 320),
-                                                    max_forward, max_backward)
+            if len(blobs) > 0:
+                sideways_control = saturation_function(camera_Kp * (blobs[largest].pt[0] - 320),
+                                                    max_forward, max_backward, 0.05)
+                rob.encoder.setSpeedsIPS(min(forward_control + sideways_control, max_forward), 
+                                         max(forward_control - sideways_control, max_backward))
+            else:
+                sideways_control = saturation_function(camera_Kp * 1000, max_forward, max_backward, 0.05)
+                rob.encoder.setSpeedsIPS(sideways_control, -sideways_control)
 
-            rob.encoder.setSpeedsIPS(min(forward_control + sideways_control, max_forward), 
-                                     max(forward_control - sideways_control, max_backward))
             time.sleep(0.01)
     else:
         start_time = time.monotonic()

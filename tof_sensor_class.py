@@ -72,3 +72,9 @@ class DistanceSensor():
             return 40.0
         else:
             return self.rSensor.get_distance() / 25.4
+
+    def ctrlC(self):
+        print("Stopping sensors")
+        self.lSensor.stop_ranging()
+        self.fSensor.stop_ranging()
+        self.rSensor.stop_ranging()

@@ -29,7 +29,7 @@ class Camera():
     # Note: the range for hue is 0-180, not 0-255
     minH = 160; minS = 120; minV =   0;
     maxH = 180; maxS = 190; maxV = 255;
-    
+
     def __init__(self):
         # Initialize the threaded camera
         # You can run the unthreaded camera instead by changing the line below.
@@ -49,11 +49,11 @@ class Camera():
             self.detector.read(fs.root())
         else:
             print("WARNING: params file not found! Creating default file.")
-            
+
             fs2 = cv.FileStorage("params.yaml", cv.FILE_STORAGE_WRITE)
             self.detector.write(fs2)
             fs2.release()
-          
+
         fs.release()
         if self.SHOW_BLOBS:
             # Create windows
@@ -62,32 +62,29 @@ class Camera():
     def get_blobs(self):
         # Get a frame
         frame = self.camera.read()
-        
+
         # Blob detection works better in the HSV color space 
         # (than the RGB color space) so the frame is converted to HSV.
         frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        
+
         # Create a mask using the given HSV range
         mask = cv.inRange(frame_hsv, (self.minH, self.minS, self.minV), (self.maxH, self.maxS, self.maxV))
-        
+
         # Run the SimpleBlobDetector on the mask.
         # The results are stored in a vector of 'KeyPoint' objects,
         # which describe the location and size of the blobs.
         keypoints = self.detector.detect(mask)
-        
+
         if self.SHOW_BLOBS:
           # Display the frame
           cv.imshow(self.WINDOW, mask)
-        
+
         return keypoints
-        
-    # Just stops the robot
+
+    def ctrlC(self):
+        print("Stopping camera")
+        self.stop()
+
+    # Stops the camera
     def stop(self):
         self.camera.stop()
-
-    # This function is called when Ctrl+C is pressed.
-    # It's intended for properly exiting the program.
-    def ctrlC(self, signum, frame):
-        print("Exiting encoder class")
-        self.stop()
-        exit()

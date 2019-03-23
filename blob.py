@@ -25,8 +25,8 @@ WINDOW2 = "Detected Blobs - Press Esc to quit"
 
 # Default HSV ranges
 # Note: the range for hue is 0-180, not 0-255
-minH =   0; minS = 127; minV =   0;
-maxH = 180; maxS = 255; maxV = 255;
+minH = 160; minS =  80; minV =   0;
+maxH = 180; maxS = 190; maxV = 255;
 
 
 # These functions are called when the user moves a trackbar
@@ -133,6 +133,7 @@ while True:
     # Write text onto the frame
     cv.putText(frame_with_keypoints, "FPS: {:.1f}".format(fps), (5, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
     cv.putText(frame_with_keypoints, "{} blobs".format(len(keypoints)), (5, 35), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
+    cv.putText(frame_with_keypoints, "blob: {}".format(keypoints[0].pt[1]), (5, 55), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
     
     # Display the frame
     cv.imshow(WINDOW1, mask)

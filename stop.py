@@ -1,10 +1,6 @@
 # Stops the robot
 
-from encoder_class import Encoder
-import RPi.GPIO as GPIO
+from robot_class import Robot
 
-print("Forced Stop")
-d = Encoder()
-d.stop()
-GPIO.cleanup()
-exit()
+rob = Robot()
+rob.stop()
