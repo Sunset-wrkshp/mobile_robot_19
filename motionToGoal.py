@@ -19,6 +19,11 @@ def motionToGoal(state_machine, rob):
         else:
             return 0
 
+
+def mtg(rob=None):
+    if rob is None:
+        rob = Robot()
+
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
@@ -67,3 +72,4 @@ if __name__ == "__main__":
     rob = Robot()
     user_input = input("Press enter to continue.")
     motionToGoal(False, rob)
+
