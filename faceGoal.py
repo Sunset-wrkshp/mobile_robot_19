@@ -46,11 +46,35 @@ def faceGoal(state_machine):
 
         # exit if used in a state machine and error is within acceptable range
         if state_machine and ((Kp * (blobs[largest].pt[0] - 320)) > -error) and ((Kp * (blobs[largest].pt[0] - 320)) < error):
+            rob.goal_in_front(True)
             return
         else:
             rob.encoder.setSpeedsIPS(proportional_control, -proportional_control)
 
         time.sleep(0.01)
+
+def check_goal_in_front(rob):
+    #checks if goal is in front within error range
+    #sets robot variable accordingly and returns True or False
+    blobs = rob.camera.get_blobs()
+
+    ERROR = 0.2
+    Kp = 0.01
+
+    #Find largest blob
+    largest = -1
+    size = 0.0
+    for i in range(len(blobs)):
+        if blobs[i].size > size:
+            size = blobs[i].size
+            largest = i
+
+    if ((Kp * (blobs[largest].pt[0] - 320)) > -error) and ((Kp * (blobs[largest].pt[0] - 320)) < error):
+        rob.goal_in_front(True)
+        return True
+    else:
+        rob.goal_in_front(False)
+        return False
 
 if __name__ == "__main__":
     faceGoal(false)
