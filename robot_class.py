@@ -58,8 +58,8 @@ class Robot():
         #sets robot variable accordingly and returns True or False
         blobs = self.camera.get_blobs()
 
-        ERROR = 0.2
-        Kp = 0.01
+        ERROR = 0.5
+        Kp = 0.009
 
         #Find largest blob
         largest = -1
@@ -69,9 +69,13 @@ class Robot():
                 size = blobs[i].size
                 largest = i
 
-        if ((Kp * (blobs[largest].pt[0] - 320)) > -error) and ((Kp * (blobs[largest].pt[0] - 320)) < error):
-            self.goal_in_front(True)
-            return True
+        if len(blobs) > 0:
+            if ((Kp * (blobs[largest].pt[0] - 320)) > -ERROR) and ((Kp * (blobs[largest].pt[0] - 320)) < ERROR):
+                self.goal_in_front(True)
+                return True
+            else:
+                self.goal_in_front(True)
+                return False
         else:
             self.goal_in_front(False)
             return False

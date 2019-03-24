@@ -2,6 +2,7 @@
 from robot_class import Robot
 from wall_following import follow_right as WF
 from motionToGoal import motionToGoal as MTG
+import time
 
 class State():
     def __init__(self):
@@ -85,6 +86,9 @@ if __name__ == '__main__':
     rob = Robot()
     print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
     MTG(True, rob)
+    if (rob.check_goal_in_front()):
+        rob.stop_range(True)
+        
     print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
     rob.stop()
     
