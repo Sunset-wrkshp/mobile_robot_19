@@ -48,8 +48,7 @@ class Robot():
             self.stop_range = val
         return self.stop_range
 
-
-    #from faceGaol.py
+    #from faceGoal.py
     def check_goal_in_front(self):
         #checks if goal is in front within error range
         #sets robot variable accordingly and returns True or False
@@ -72,3 +71,4 @@ class Robot():
         else:
             self.goal_in_front(False)
             return False
+
