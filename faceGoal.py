@@ -18,11 +18,11 @@ def faceGoal(state_machine, rob):
 
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
-    ERROR = 0.2
+    ERROR = 0.5
 
     desired_distance = 5
     # Proportional gain
-    Kp = 0.01
+    Kp = 0.009
 
     while (True):
         blobs = rob.camera.get_blobs()

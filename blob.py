@@ -26,7 +26,7 @@ WINDOW2 = "Detected Blobs - Press Esc to quit"
 # Default HSV ranges
 # Note: the range for hue is 0-180, not 0-255
 minH = 160; minS = 120; minV =   0;
-maxH = 180; maxS = 190; maxV = 255;
+maxH = 180; maxS = 210; maxV = 255;
 
 
 # These functions are called when the user moves a trackbar
