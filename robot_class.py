@@ -30,7 +30,7 @@ class Robot():
         #goal is in front of the robot
         if val is not None:
             self.GIF = val
-        else:
+       # else:
 
         return self.GIF
 

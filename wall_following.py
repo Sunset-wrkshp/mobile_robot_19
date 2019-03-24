@@ -1,12 +1,11 @@
 from robot_class import Robot
 import time as time
 
-def follow_right(rob):
-    #rob = Robot()
+def follow_right(state machine = None, rob):
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
-    desired_distance = 5
+    desired_distance = (10*0.393701)
     # Proportional gain
     Kp = 4.7
 
@@ -16,15 +15,23 @@ def follow_right(rob):
         r_distance = rob.distance_sensor.get_right_inches()
         f_distance = rob.distance_sensor.get_front_inches()
 
+        if (rob.check_goal_in_front() and f_distance >= (desired_distance * 2)):
+            #check if goal in front
+            #check if no wall in front
+            rob.no_wall_detected(True)
+            return
+
         r_proportional_control = saturation_function(Kp * (desired_distance - r_distance),
                                                         max_forward, max_backward)
         f_proportional_control = saturation_function(Kp * (desired_distance - min(f_distance, r_distance)),
                                                         max_forward, max_backward)
 
         if f_distance < (desired_distance * 2):
+            #front wall is deteced withing distance*2 inches. Starts to turn
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control,
                                         max_forward), max_forward)
         else:
+            #No front wall detected
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
                                     min(max_forward - r_proportional_control, max_forward))
         time.sleep(0.01)
