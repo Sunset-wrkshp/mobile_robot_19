@@ -29,7 +29,7 @@ class Robot():
     def goal_in_front(self, val = None):
         if val is not None:
             self.GIF = val
-        else:
+       # else:
 
         return self.GIF
 
