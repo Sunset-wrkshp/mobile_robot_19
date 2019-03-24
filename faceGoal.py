@@ -35,9 +35,15 @@ def faceGoal(state_machine, rob):
                 size = blobs[i].size
                 largest = i
 
+        speed = 0
         if len(blobs) > 0:
-            proportional_control = saturation_function(Kp * (blobs[largest].pt[0] - 320),
-                                                        max_forward, max_backward, ERROR)
+            if (blobs[largest].pt[0] - 320) < -ERROR:
+                speed = Kp * (blobs[largest].pt[0] - 320 + ERROR)
+            elif (blobs[largest].pt[0] - 320) > ERROR:
+                speed = Kp * (blobs[largest].pt[0] - 320 - ERROR)
+            proportional_control = saturation_function(speed, max_forward, max_backward, ERROR)
+            #proportional_control = saturation_function(Kp * (blobs[largest].pt[0] - 320),
+            #                                            max_forward, max_backward, ERROR)
         else:
             proportional_control = saturation_function(Kp * 640, max_forward, max_backward, ERROR)
 

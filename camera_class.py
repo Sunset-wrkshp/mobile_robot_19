@@ -20,7 +20,7 @@ from UnthreadedWebcam import UnthreadedWebcam
 class Camera():
 
     FPS_SMOOTHING = 0.9
-    SHOW_BLOBS = False
+    SHOW_BLOBS = True
 
     # Window names
     WINDOW = "Adjustable Mask - Press Esc to quit"

@@ -4,6 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from faceGoal import faceGoal
 
+def mtg(rob=None):
+    if rob is None:
+        rob = Robot()
+
 def motionToGoal(state_machine, rob):
     def saturation_function(proportional_speed, max_forward_speed, max_backward_speed, error):
         if proportional_speed < -error:
@@ -18,11 +22,6 @@ def motionToGoal(state_machine, rob):
                 return proportional_speed - error
         else:
             return 0
-
-
-def mtg(rob=None):
-    if rob is None:
-        rob = Robot()
 
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
