@@ -12,8 +12,8 @@ class Robot():
         signal.signal(signal.SIGINT, self.ctrlC)
         self.GIF = None
         self.no_wall = None
-        self.less_than_10cm = None
-        self.stop_range = None
+        self.less_than_10 = None
+        self.stop_r = None
 
     def stop(self):
         print("Exiting")
@@ -43,14 +43,14 @@ class Robot():
     def less_than_10cm(self, val = None):
         #something is in front of the robot within 10 cm that is not the goal
         if val is not None:
-            self.less_than_10cm = val
-        return self.less_than_10cm
+            self.less_than_10 = val
+        return self.less_than_10
 
     def stop_range(self, val = None):
         #robot front is within proper distance +- error of goal
         if val is not None:
-            self.stop_range = val
-        return self.stop_range
+            self.stop_r = val
+        return self.stop_r
 
     #from faceGoal.py
     def check_goal_in_front(self):

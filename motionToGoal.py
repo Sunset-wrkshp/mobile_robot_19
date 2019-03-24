@@ -4,10 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from faceGoal import faceGoal
 
-def mtg(rob=None):
-    if rob is None:
-        rob = Robot()
-
 def motionToGoal(state_machine, rob):
     def saturation_function(proportional_speed, max_forward_speed, max_backward_speed, error):
         if proportional_speed < -error:
@@ -28,13 +24,14 @@ def motionToGoal(state_machine, rob):
 
     desired_distance = (10*0.393701)
     # Proportional gain
-    camera_Kp = 0.01
-    sensor_Kp = 1.5
+    camera_Kp = 0.025
+    sensor_Kp = 2
 
     while True:
+##        print("loop")
         distance = rob.distance_sensor.get_front_inches()
         forward_control = saturation_function(sensor_Kp * (distance - desired_distance),
-                                                        max_forward, max_backward, 0.2)
+                                                        max_forward, max_backward, .7)
         blobs = rob.camera.get_blobs()
 
         #Find largest blob
@@ -46,24 +43,33 @@ def motionToGoal(state_machine, rob):
                 largest = i
 
         if len(blobs) > 0:
+            print("I found the goal")
             rob.goal_in_front(True)
             sideways_control = saturation_function(camera_Kp * (blobs[largest].pt[0] - 320),
-                                                   max_forward, max_backward, 0.05)
+                                                   max_forward, max_backward, .5)
         else:
+            print("I'm looking for the goal")
             rob.goal_in_front(False)
             faceGoal(True, rob)
             continue
 
-        if (forward_control == 0) and (sideways_control == 0):
-            #something is within 10 cm in front of robot.
-            if state_machine:
-                # rob.stop_range(True)
-                # rob.goal_in_front(True)
-                # rob.no_wall_detected(False)
-                rob.less_than_10cm(True)
-                return
+        if (forward_control == 0):
+            print("Front not moving")
+            if (sideways_control == 0):
+                print("side not moving")
+                #something is within 10 cm in front of robot.
+                if state_machine:
+                    # rob.stop_range(True)
+                    # rob.goal_in_front(True)
+                    # rob.no_wall_detected(False)
+                    # print("I'm in the state machine and I'm not moving")
+                    rob.less_than_10cm(True)
+                    rob.stop_range(True)
+                    return
+                else:
+                    time.sleep(0.1)
             else:
-                time.sleep(0.1)
+                continue
         else:
             #goal in front = True?
             rob.encoder.setSpeedsIPS(min(forward_control + sideways_control, max_forward),

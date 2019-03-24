@@ -1,5 +1,5 @@
 #State Machine (Moore)
-import robot_class
+from robot_class import Robot
 from wall_following import follow_right as WF
 from motionToGoal import motionToGoal as MTG
 
@@ -82,8 +82,12 @@ class State_Machine():
 
 ## testing code
 if __name__ == '__main__':
-    rob = robot_class()
+    rob = Robot()
+    print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
     MTG(True, rob)
+    print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
+    rob.stop()
+    
     # test = State_Machine()
 
     # test.run()
