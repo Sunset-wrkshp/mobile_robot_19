@@ -24,8 +24,8 @@ class State():
 class start_state(State):
 
     def event(self, event=None):
-        return motion_to_goal(rob)
-
+##        return goal_facing(rob)
+        return wall_follow(rob)
         #if goal in front but front wall detected: WF
         #if goal in front and no front wall detected: MTG
         #if goal is not in front: GF
@@ -36,21 +36,28 @@ class goal_facing(State):
 
     def event(self, event=None):
         GF(True, rob)
-        if
-        return motion_to_goal()
+        if rob.goal_in_front():
+            print("I finished GF")
+            return motion_to_goal(rob)
+        else:
+            return goal_facing(rob)
+            
         #run goal facing
         #if goal is not in front and front sensor < 4 in: WF
         #If goal is in front: MTG
         #if goal not in front: GF
 
-        pass
-
 class motion_to_goal(State):
 
     def event(self, event=None):
-        if goal_in_front():
+        MTG(True, rob)
+        if (rob.check_goal_in_front() and rob.less_than_10cm()):
             return stop_state(rob)
-        else return motion_to_goal(rob)
+        else:
+            return MTG(True, rob)
+##        if goal_in_front():
+##            return stop_state(rob)
+##        else return motion_to_goal(rob)
 
         #run motion to goal
         #if goal is not in front and front wall detected <= 10cm: WF
@@ -61,7 +68,12 @@ class motion_to_goal(State):
 class wall_follow(State):
 
     def event(self, event=None):
-        return proportion_control()
+        WF(True, rob)
+        if rob.goal_in_front() and rob.no_wall_detected():
+            return motion_to_goal(rob)
+        else:
+            return wall_follow(rob)
+        
         #run wall following
         #if goal is in front and front wall is not detected: MTG
         pass
@@ -99,7 +111,12 @@ def print_status():
 if __name__ == '__main__':
     rob = Robot()
 
+    #SM = True
+    
     SM = State_Machine(rob)
+    SM.run()
+    
+    rob.stop()
 # ##    for x in range(0,100):
 # ##        rob.check_goal_in_front()
 # ##        print_status()

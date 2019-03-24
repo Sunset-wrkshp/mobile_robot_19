@@ -15,7 +15,7 @@ def follow_right(state_machine, rob):
         r_distance = rob.distance_sensor.get_right_inches()
         f_distance = rob.distance_sensor.get_front_inches()
         
-        if (f_distance >= (desired_distance * 10) and rob.check_goal_in_front()):
+        if (f_distance >= (desired_distance) and rob.check_goal_in_front()):
             #check if goal in front
             #check if no wall in front
             print("Goal is in front and getting close to it.")
