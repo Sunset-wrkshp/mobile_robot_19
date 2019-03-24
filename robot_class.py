@@ -27,6 +27,7 @@ class Robot():
 
     #getters and setters
     def goal_in_front(self, val = None):
+        #goal is in front of the robot
         if val is not None:
             self.GIF = val
        # else:
@@ -34,16 +35,19 @@ class Robot():
         return self.GIF
 
     def no_wall_detected(self, val = None):
+        #No wall is in front of the robot within 10 cm
         if val is not None:
             self.no_wall = val
         return self.no_wall
 
     def less_than_10cm(self, val = None):
+        #something is in front of the robot within 10 cm that is not the goal
         if val is not None:
             self.less_than_10cm = val
         return self.less_than_10cm
 
     def stop_range(self, val = None):
+        #robot front is within proper distance +- error of goal
         if val is not None:
             self.stop_range = val
         return self.stop_range
@@ -71,4 +75,3 @@ class Robot():
         else:
             self.goal_in_front(False)
             return False
-
