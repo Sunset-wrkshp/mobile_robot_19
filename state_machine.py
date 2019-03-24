@@ -2,6 +2,7 @@
 from robot_class import Robot
 from wall_following import follow_right as WF
 from motionToGoal import motionToGoal as MTG
+from faceGoal import faceGoal as GF
 import time
 
 class State():
@@ -95,6 +96,8 @@ if __name__ == '__main__':
 ##    for x in range(0,100):
 ##        rob.check_goal_in_front()
 ##        print_status()
+    print_status()
+    GF(True, rob)
     print_status()
     WF(True, rob)
     print_status()

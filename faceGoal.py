@@ -50,6 +50,8 @@ def faceGoal(state_machine, rob):
         # exit if used in a state machine and error is within acceptable range
 
         if state_machine and (proportional_control == 0):
+            rob.goal_in_front(True)
+            rob.encoder.setSpeedsIPS(0,0)
             return
         elif (proportional_control == 0):
             time.sleep(0.1)
