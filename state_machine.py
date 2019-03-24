@@ -4,9 +4,11 @@ from wall_following import follow_right as WF
 from motionToGoal import motionToGoal as MTG
 import time
 
-class State():
+class State(robot_instance):
+    rob = None
     def __init__(self):
         print("Current State: {}".format(self))
+        rob = robot_instance
 
     def event(self, event):
         pass
@@ -18,17 +20,18 @@ class State():
         return self.__class__.__name__
 
 
-class start_state(State):
+class start_state(State, robot_instance):
 
     def event(self, event=None):
         #calibrate robot
+
         #if goal in front but front wall detected: WF
         #if goal in front and no front wall detected: MTG
         #if goal is not in front: GF
         pass
 
 
-class goal_facing(State):
+class goal_facing(State, robot_instance):
 
     def event(self, event=None):
         return motion_to_goal()
@@ -39,7 +42,7 @@ class goal_facing(State):
 
         pass
 
-class motion_to_goal(State):
+class motion_to_goal(State, robot_instance):
 
     def event(self, event=None):
         return wall_follow()
@@ -49,7 +52,7 @@ class motion_to_goal(State):
         #if goal is not in front and no wall detected: GF
         pass
 
-class wall_follow(State):
+class wall_follow(State, robot_instance):
 
     def event(self, event=None):
         return proportion_control()
@@ -58,7 +61,7 @@ class wall_follow(State):
         pass
 
 
-class stop_state(State):
+class stop_state(State, robot_instance):
 
     def event(self, event=None):
         print("Finished")
@@ -70,11 +73,13 @@ class stop_state(State):
         pass
 
 
-class State_Machine():
+class State_Machine(rob):
     #Moore Machine
     state = None
+    robot = None
     def __init__(self):
-        self.state = start_state()
+        robot = rob
+        self.state = start_state(rob)
 
     def run(self):
         while(self.state is not False):
@@ -88,10 +93,10 @@ if __name__ == '__main__':
     MTG(True, rob)
     if (rob.check_goal_in_front()):
         rob.stop_range(True)
-        
+
     print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
     rob.stop()
-    
+
     # test = State_Machine()
 
     # test.run()
