@@ -18,11 +18,11 @@ def faceGoal(state_machine, rob):
 
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
-    ERROR = 0.2
+    ERROR = 0.5
 
     desired_distance = 5
     # Proportional gain
-    Kp = 0.01
+    Kp = 0.009
 
     while (True):
         blobs = rob.camera.get_blobs()
@@ -35,9 +35,15 @@ def faceGoal(state_machine, rob):
                 size = blobs[i].size
                 largest = i
 
+        speed = 0
         if len(blobs) > 0:
-            proportional_control = saturation_function(Kp * (blobs[largest].pt[0] - 320),
-                                                        max_forward, max_backward, ERROR)
+            if (blobs[largest].pt[0] - 320) < -ERROR:
+                speed = Kp * (blobs[largest].pt[0] - 320 + ERROR)
+            elif (blobs[largest].pt[0] - 320) > ERROR:
+                speed = Kp * (blobs[largest].pt[0] - 320 - ERROR)
+            proportional_control = saturation_function(speed, max_forward, max_backward, ERROR)
+            #proportional_control = saturation_function(Kp * (blobs[largest].pt[0] - 320),
+            #                                            max_forward, max_backward, ERROR)
         else:
             proportional_control = saturation_function(Kp * 640, max_forward, max_backward, ERROR)
 

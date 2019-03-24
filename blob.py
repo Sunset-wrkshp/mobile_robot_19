@@ -25,8 +25,8 @@ WINDOW2 = "Detected Blobs - Press Esc to quit"
 
 # Default HSV ranges
 # Note: the range for hue is 0-180, not 0-255
-minH = 160; minS =  80; minV =   0;
-maxH = 180; maxS = 190; maxV = 255;
+minH = 160; minS = 120; minV =   0;
+maxH = 180; maxS = 210; maxV = 255;
 
 
 # These functions are called when the user moves a trackbar
@@ -117,6 +117,7 @@ while True:
     
     # Blob detection works better in the HSV color space 
     # (than the RGB color space) so the frame is converted to HSV.
+    #frame = cv.medianBlur(frame,5)
     frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     
     # Create a mask using the given HSV range
@@ -133,7 +134,15 @@ while True:
     # Write text onto the frame
     cv.putText(frame_with_keypoints, "FPS: {:.1f}".format(fps), (5, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
     cv.putText(frame_with_keypoints, "{} blobs".format(len(keypoints)), (5, 35), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
-    cv.putText(frame_with_keypoints, "blob: {}".format(keypoints[0].pt[1]), (5, 55), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
+    if (len(keypoints) > 0):
+        #Find largest blob
+        largest = -1
+        size = 0.0
+        for i in range(len(keypoints)):
+            if keypoints[i].size > size:
+                size = keypoints[i].size
+                largest = i
+        cv.putText(frame_with_keypoints, "blob: {}".format(keypoints[largest].pt[1]), (5, 55), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0))
     
     # Display the frame
     cv.imshow(WINDOW1, mask)

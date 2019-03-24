@@ -12,8 +12,8 @@ class Robot():
         signal.signal(signal.SIGINT, self.ctrlC)
         self.GIF = None
         self.no_wall = None
-        self.less_than_10cm = None
-        self.stop_range = None
+        self.less_than_10 = None
+        self.stop_r = None
 
     def stop(self):
         print("Exiting")
@@ -43,14 +43,14 @@ class Robot():
     def less_than_10cm(self, val = None):
         #something is in front of the robot within 10 cm that is not the goal
         if val is not None:
-            self.less_than_10cm = val
-        return self.less_than_10cm
+            self.less_than_10 = val
+        return self.less_than_10
 
     def stop_range(self, val = None):
         #robot front is within proper distance +- error of goal
         if val is not None:
-            self.stop_range = val
-        return self.stop_range
+            self.stop_r = val
+        return self.stop_r
 
     #from faceGoal.py
     def check_goal_in_front(self):
@@ -58,8 +58,8 @@ class Robot():
         #sets robot variable accordingly and returns True or False
         blobs = self.camera.get_blobs()
 
-        ERROR = 0.2
-        Kp = 0.01
+        ERROR = 0.5
+        Kp = 0.009
 
         #Find largest blob
         largest = -1
@@ -69,9 +69,13 @@ class Robot():
                 size = blobs[i].size
                 largest = i
 
-        if ((Kp * (blobs[largest].pt[0] - 320)) > -error) and ((Kp * (blobs[largest].pt[0] - 320)) < error):
-            self.goal_in_front(True)
-            return True
+        if len(blobs) > 0:
+            if ((Kp * (blobs[largest].pt[0] - 320)) > -ERROR) and ((Kp * (blobs[largest].pt[0] - 320)) < ERROR):
+                self.goal_in_front(True)
+                return True
+            else:
+                self.goal_in_front(True)
+                return False
         else:
             self.goal_in_front(False)
             return False
