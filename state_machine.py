@@ -4,9 +4,9 @@ from wall_following import follow_right as WF
 from motionToGoal import motionToGoal as MTG
 import time
 
-class State(robot_instance):
+class State():
     rob = None
-    def __init__(self):
+    def __init__(self, robot_instance):
         print("Current State: {}".format(self))
         rob = robot_instance
 
@@ -20,7 +20,7 @@ class State(robot_instance):
         return self.__class__.__name__
 
 
-class start_state(State, robot_instance):
+class start_state(State):
 
     def event(self, event=None):
         #calibrate robot
@@ -31,7 +31,7 @@ class start_state(State, robot_instance):
         pass
 
 
-class goal_facing(State, robot_instance):
+class goal_facing(State):
 
     def event(self, event=None):
         return motion_to_goal()
@@ -42,7 +42,7 @@ class goal_facing(State, robot_instance):
 
         pass
 
-class motion_to_goal(State, robot_instance):
+class motion_to_goal(State):
 
     def event(self, event=None):
         return wall_follow()
@@ -52,7 +52,7 @@ class motion_to_goal(State, robot_instance):
         #if goal is not in front and no wall detected: GF
         pass
 
-class wall_follow(State, robot_instance):
+class wall_follow(State):
 
     def event(self, event=None):
         return proportion_control()
@@ -61,7 +61,7 @@ class wall_follow(State, robot_instance):
         pass
 
 
-class stop_state(State, robot_instance):
+class stop_state(State):
 
     def event(self, event=None):
         print("Finished")
@@ -73,11 +73,11 @@ class stop_state(State, robot_instance):
         pass
 
 
-class State_Machine(rob):
+class State_Machine():
     #Moore Machine
     state = None
     robot = None
-    def __init__(self):
+    def __init__(self,rob):
         robot = rob
         self.state = start_state(rob)
 
@@ -85,16 +85,27 @@ class State_Machine(rob):
         while(self.state is not False):
             self.state = self.state.event()
 
+def print_status():
+    print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
+
 
 ## testing code
 if __name__ == '__main__':
     rob = Robot()
-    print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
-    MTG(True, rob)
+##    for x in range(0,100):
+##        rob.check_goal_in_front()
+##        print_status()
+    print_status()
+    WF(True, rob)
+    print_status()
     if (rob.check_goal_in_front()):
-        rob.stop_range(True)
-
-    print("GIF:{0}, no_wall:{1}, <10cm:{2}, stop_r:{3}".format(rob.GIF, rob.no_wall, rob.less_than_10, rob.stop_r))
+        MTG(True, rob)
+        print_status()
+        if (rob.check_goal_in_front()):
+            rob.stop_range(True)
+    else:
+        print("oof")
+        print_status()
     rob.stop()
 
     # test = State_Machine()

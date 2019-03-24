@@ -54,6 +54,7 @@ class Robot():
 
     #from faceGoal.py
     def check_goal_in_front(self):
+        print("Checking")
         #checks if goal is in front within error range
         #sets robot variable accordingly and returns True or False
         blobs = self.camera.get_blobs()
@@ -71,11 +72,19 @@ class Robot():
 
         if len(blobs) > 0:
             if ((Kp * (blobs[largest].pt[0] - 320)) > -ERROR) and ((Kp * (blobs[largest].pt[0] - 320)) < ERROR):
-                self.goal_in_front(True)
-                return True
+                if ((Kp* (blobs[largest].pt[1] - 240) > -2*ERROR) and ((Kp * (blobs[largest].pt[1] - 240)) < 2*ERROR)):
+                    self.goal_in_front(True)
+                    print("GIF True")
+                    return True
+                else:
+                    self.goal_in_front(False)
+                    print("GIF False because too high")
+                    return False
             else:
-                self.goal_in_front(True)
+                self.goal_in_front(False)
+                print("GIF False goal not in range")
                 return False
         else:
             self.goal_in_front(False)
+            print("GIF False no blobs")
             return False
