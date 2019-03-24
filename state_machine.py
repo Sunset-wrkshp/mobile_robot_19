@@ -24,7 +24,7 @@ class State():
 class start_state(State):
 
     def event(self, event=None):
-        #calibrate robot
+        return motion_to_goal(rob)
 
         #if goal in front but front wall detected: WF
         #if goal in front and no front wall detected: MTG
@@ -35,6 +35,8 @@ class start_state(State):
 class goal_facing(State):
 
     def event(self, event=None):
+        GF(True, rob)
+        if
         return motion_to_goal()
         #run goal facing
         #if goal is not in front and front sensor < 4 in: WF
@@ -46,7 +48,10 @@ class goal_facing(State):
 class motion_to_goal(State):
 
     def event(self, event=None):
-        return wall_follow()
+        if goal_in_front():
+            return stop_state(rob)
+        else return motion_to_goal(rob)
+
         #run motion to goal
         #if goal is not in front and front wall detected <= 10cm: WF
         #if goal in front and 5 in of Goal: Stop
@@ -93,24 +98,26 @@ def print_status():
 ## testing code
 if __name__ == '__main__':
     rob = Robot()
-##    for x in range(0,100):
-##        rob.check_goal_in_front()
-##        print_status()
-    print_status()
-    GF(True, rob)
-    print_status()
-    WF(True, rob)
-    print_status()
-    if (rob.check_goal_in_front()):
-        MTG(True, rob)
-        print_status()
-        if (rob.check_goal_in_front()):
-            rob.stop_range(True)
-    else:
-        print("oof")
-        print_status()
-    rob.stop()
 
-    # test = State_Machine()
-
-    # test.run()
+    SM = State_Machine(rob)
+# ##    for x in range(0,100):
+# ##        rob.check_goal_in_front()
+# ##        print_status()
+#     print_status()
+#     GF(True, rob)
+#     print_status()
+#     WF(True, rob)
+#     print_status()
+#     if (rob.check_goal_in_front()):
+#         MTG(True, rob)
+#         print_status()
+#         if (rob.check_goal_in_front()):
+#             rob.stop_range(True)
+#     else:
+#         print("oof")
+#         print_status()
+#     rob.stop()
+#
+#     # test = State_Machine()
+#
+#     # test.run()
