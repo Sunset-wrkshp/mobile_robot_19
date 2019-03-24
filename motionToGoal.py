@@ -26,15 +26,17 @@ def motionToGoal(state_machine, rob):
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
-    desired_distance = 5
+    desired_distance = (10*0.393701)
     # Proportional gain
     camera_Kp = 0.01
     sensor_Kp = 1.5
 
     while True:
         distance = rob.distance_sensor.get_front_inches()
+        #if
         forward_control = saturation_function(sensor_Kp * (distance - desired_distance),
                                                         max_forward, max_backward, 0.2)
+
 
 
         blobs = rob.camera.get_blobs()
@@ -48,6 +50,7 @@ def motionToGoal(state_machine, rob):
                 largest = i
 
         if len(blobs) > 0:
+            rob.goal_in_front(True)
             sideways_control = saturation_function(camera_Kp * (blobs[largest].pt[0] - 320),
                                                    max_forward, max_backward, 0.05)
 
