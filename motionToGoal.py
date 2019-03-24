@@ -19,11 +19,6 @@ def motionToGoal(state_machine, rob):
         else:
             return 0
 
-
-def mtg(rob=None):
-    if rob is None:
-        rob = Robot()
-
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
@@ -34,12 +29,8 @@ def mtg(rob=None):
 
     while True:
         distance = rob.distance_sensor.get_front_inches()
-        #if
         forward_control = saturation_function(sensor_Kp * (distance - desired_distance),
                                                         max_forward, max_backward, 0.2)
-
-
-
         blobs = rob.camera.get_blobs()
 
         #Find largest blob
@@ -54,18 +45,24 @@ def mtg(rob=None):
             rob.goal_in_front(True)
             sideways_control = saturation_function(camera_Kp * (blobs[largest].pt[0] - 320),
                                                    max_forward, max_backward, 0.05)
-
         else:
+            rob.goal_in_front(False)
             faceGoal(True, rob)
             continue
 
         if (forward_control == 0) and (sideways_control == 0):
+            #something is within 10 cm in front of robot.
             if state_machine:
+                # rob.stop_range(True)
+                # rob.goal_in_front(True)
+                # rob.no_wall_detected(False)
+                rob.less_than_10cm(True)
                 return
             else:
                 time.sleep(0.1)
         else:
-            rob.encoder.setSpeedsIPS(min(forward_control + sideways_control, max_forward), 
+            #goal in front = True?
+            rob.encoder.setSpeedsIPS(min(forward_control + sideways_control, max_forward),
                                      max(forward_control - sideways_control, max_backward))
 
         time.sleep(0.01)
@@ -75,4 +72,3 @@ if __name__ == "__main__":
     rob = Robot()
     user_input = input("Press enter to continue.")
     motionToGoal(False, rob)
-
