@@ -50,8 +50,9 @@ def motionToGoal(state_machine, rob):
         else:
             print("I'm looking for the goal")
             rob.goal_in_front(False)
-            faceGoal(True, rob)
-            continue
+            return
+##            faceGoal(True, rob)
+##            continue
 
         if (forward_control == 0):
             print("Front not moving")

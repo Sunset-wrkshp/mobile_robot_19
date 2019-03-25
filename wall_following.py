@@ -9,7 +9,7 @@ def follow_right(state_machine, rob):
     # Proportional gain
     Kp = 2
 
-    user_input = input("Place robot beside wall and press enter to continue.")
+##    user_input = input("Place robot beside wall and press enter to continue.")
 
     while (True):
         r_distance = rob.distance_sensor.get_right_inches()
@@ -51,7 +51,7 @@ def follow_left(rob):
     # Proportional gain
     Kp = 4.7
 
-    user_input = input("Place robot beside wall and press enter to continue.")
+##    user_input = input("Place robot beside wall and press enter to continue.")
 
     while (True):
         l_distance = rob.distance_sensor.get_left_inches()

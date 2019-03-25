@@ -46,6 +46,8 @@ class goal_facing(State):
         if rob.goal_in_front():
             # print("I finished GF")
             return motion_to_goal(rob)
+        elif (not rob.goal_in_front() and not rob.check_no_wall_in_front()):
+            return wall_following(rob)
         else:
             return goal_facing(rob)
 
@@ -66,7 +68,10 @@ class motion_to_goal(State):
             else:
                 return motion_to_goal(rob)
         else:
-            return motion_to_goal(rob)
+            if not rob.check_no_wall_in_front():
+                return wall_follow(rob)
+            else:
+                return goal_facing(rob)
 ##        if goal_in_front():
 ##            return stop_state(rob)
 ##        else return motion_to_goal(rob)
@@ -96,12 +101,12 @@ class stop_state(State):
     def event(self, event=None):
         # return False
         #stop moving the robot
-        rob.setSpeedsIPS(0,0)
+        rob.encoder.setSpeedsIPS(0,0)
         if (not rob.check_goal_in_front()):
             return goal_facing(rob)
         elif(rob.check_goal_in_front() and rob.check_no_wall_in_front()):
             f_distance = rob.distance_sensor.get_front_inches()
-            if (f_distance > 4 and f_distance < 10):
+            if (f_distance > 5 and f_distance < 10):
                 return motion_to_goal(rob)
             else:
                 return stop_state(rob)
