@@ -63,8 +63,8 @@ def motionToGoal(state_machine, rob):
                     # rob.goal_in_front(True)
                     # rob.no_wall_detected(False)
                     # print("I'm in the state machine and I'm not moving")
-                    rob.less_than_10cm(True)
-                    # rob.stop_range(True)
+                    # rob.less_than_10cm(True)
+                    rob.stop_range(True)
                     return
                 else:
                     time.sleep(0.1)
