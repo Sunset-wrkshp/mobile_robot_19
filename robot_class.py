@@ -88,3 +88,12 @@ class Robot():
             self.goal_in_front(False)
             print("GIF False no blobs")
             return False
+
+        def check_no_wall_in_front():
+            f_distance = distance_sensor.get_front_inches()
+            if (f_distance > 3*(10*0.393701)):
+                self.no_wall_detected(True)
+                return True
+            else:
+                self.no_wall_detected(False)
+                return False
