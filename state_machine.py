@@ -25,7 +25,14 @@ class start_state(State):
 
     def event(self, event=None):
 ##        return goal_facing(rob)
-        return wall_follow(rob)
+        #return wall_follow(rob)
+        if rob.check_goal_in_front():
+            if not rob.check_no_wall_in_front():
+                return wall_follow(rob)
+            else:
+                return motion_to_goal(rob)
+        else:
+            return goal_facing(rob)
         #if goal in front but front wall detected: WF
         #if goal in front and no front wall detected: MTG
         #if goal is not in front: GF
@@ -93,7 +100,7 @@ class stop_state(State):
         if (not rob.check_goal_in_front()):
             return goal_facing(rob)
         elif(rob.check_goal_in_front() and rob.check_no_wall_in_front()):
-            f_distance  rob.distance_sensor.get_front_inches()
+            f_distance = rob.distance_sensor.get_front_inches()
             if (f_distance > 4 and f_distance < 10):
                 return motion_to_goal(rob)
             else:
@@ -103,7 +110,6 @@ class stop_state(State):
         #if goal is not in front: GF
         #if goal is in front > 5 inch:  MTG
         #else: stop
-        pass
 
 
 class State_Machine():
@@ -126,15 +132,17 @@ def print_status():
 if __name__ == '__main__':
     rob = Robot()
 
-    #SM = True
+    SM = True
 
-    # SM = State_Machine(rob)
-    # SM.run()
-    for s in range (0,100):
-        rob.check_no_wall_in_front()
-        print_status()
+    SM = State_Machine(rob)
+    SM.run()
+##    GF(True, rob)
+##    for s in range (0,100):
+##        print(rob.check_no_wall_in_front())
+##        print_status()
+##    
+
     
-
     rob.stop()
 # ##    for x in range(0,100):
 # ##        rob.check_goal_in_front()
