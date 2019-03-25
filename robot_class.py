@@ -90,7 +90,7 @@ class Robot():
             return False
 
     def check_no_wall_in_front(self):
-        f_distance = distance_sensor.get_front_inches()
+        f_distance = self.distance_sensor.get_front_inches()
         GIF = self.check_goal_in_front()
         if (GIF):
             if (f_distance > 3*(10*0.393701)):

@@ -68,7 +68,7 @@ class motion_to_goal(State):
             else:
                 return motion_to_goal(rob)
         else:
-            if not rob.check_no_wall_in_front():
+            if (not rob.check_no_wall_in_front()):
                 return wall_follow(rob)
             else:
                 return goal_facing(rob)
