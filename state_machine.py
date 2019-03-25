@@ -97,14 +97,19 @@ class wall_follow(State):
 
 
 class stop_state(State):
-
+    
     def event(self, event=None):
         # return False
         #stop moving the robot
         rob.encoder.setSpeedsIPS(0,0)
-        if (not rob.check_goal_in_front()):
+        t_set= []
+        for x in range (0,10):
+            t_set.append(rob.check_goal_in_front())
+        print(t_set)
+            
+        if (not any(t_set)):
             return goal_facing(rob)
-        elif(rob.check_goal_in_front() and rob.check_no_wall_in_front()):
+        elif(any(t_set) and rob.check_no_wall_in_front()):
             f_distance = rob.distance_sensor.get_front_inches()
             if (f_distance > 5 and f_distance < 10):
                 return motion_to_goal(rob)

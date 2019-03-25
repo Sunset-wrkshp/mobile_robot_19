@@ -35,10 +35,10 @@ def follow_right(state_machine, rob):
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control,
                                         max_forward), max_forward)
         else:
-            if (state_machine and (r_distance > (desired_distance * 2))):
+            if (state_machine and (r_distance > (desired_distance * 20))):
                 print("going straight")
-                rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
-                                        min(max_forward - r_proportional_control, max_forward))
+                rob.encoder.setSpeedsIPS(max_forward,
+                                        max_forward)
             else:
                 #No front wall detected
                 print("Wall following")
