@@ -14,7 +14,7 @@ def follow_right(state_machine, rob):
     while (True):
         r_distance = rob.distance_sensor.get_right_inches()
         f_distance = rob.distance_sensor.get_front_inches()
-        
+
         if (f_distance >= (desired_distance) and rob.check_goal_in_front()):
             #check if goal in front
             #check if no wall in front
@@ -35,10 +35,15 @@ def follow_right(state_machine, rob):
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control,
                                         max_forward), max_forward)
         else:
-            #No front wall detected
-            print("Wall following")
-            rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
-                                    min(max_forward - r_proportional_control, max_forward))
+            if (state_machine and (r_distance > (desired_distance * 2))):
+                print("going straight")
+                rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
+                                        min(max_forward - r_proportional_control, max_forward))
+            else:
+                #No front wall detected
+                print("Wall following")
+                rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
+                                        min(max_forward - r_proportional_control, max_forward))
         time.sleep(0.01)
 
 
