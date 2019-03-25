@@ -16,7 +16,7 @@ class Robot():
         self.stop_r = None
 
     def stop(self):
-        print("Exiting")
+        print("Exiting Robot")
         self.encoder.ctrlC()
         self.camera.ctrlC()
         self.distance_sensor.ctrlC()
@@ -54,7 +54,7 @@ class Robot():
 
     #from faceGoal.py
     def check_goal_in_front(self):
-        print("Checking")
+        print("Checking GIF()")
         #checks if goal is in front within error range
         #sets robot variable accordingly and returns True or False
         blobs = self.camera.get_blobs()
@@ -89,20 +89,14 @@ class Robot():
             print("GIF False no blobs")
             return False
 
-    def check_no_wall_in_front(self):
-        f_distance = self.distance_sensor.get_front_inches()
-        GIF = self.check_goal_in_front()
-        if (not GIF):
-            print("Goal not in front ")
-            if (f_distance > 3*(10*0.393701)):
-                print("Nothing within range")
-                self.no_wall_detected(True)
-                return True
-            else:
-                print("something within range")
-                self.no_wall_detected(False)
-                return False
-        else:
-            print("Goal in front")
-            self.no_wall_detected(True)
-            return True
+        def check_no_wall_in_front(self):
+            f_distance = distance_sensor.get_front_inches()
+            GIF = self.check_goal_in_front()
+            if (GIF):
+                if (f_distance > 3*(10*0.393701)):
+                    print("GIF but also a wall")
+                    self.no_wall_detected(True)
+                    return True
+                else:
+                    self.no_wall_detected(False)
+                    return False

@@ -162,7 +162,7 @@ class Encoder():
                 calib.set_calib(speeds)
             self.calibrated_speeds = speeds
         #For TESTING
-        print(self.calibrated_speeds)
+        # print(self.calibrated_speeds)
 
 
     def setSpeedsRPS(self, L, R):
