@@ -46,11 +46,16 @@ def motionToGoal(state_machine, rob):
             print("I found the goal")
             rob.goal_in_front(True)
             sideways_control = saturation_function(camera_Kp * (blobs[largest].pt[0] - 320),
-                                                   max_forward, max_backward, .5)
+                                                   max_forward, max_backward, .2)
         else:
             print("I'm looking for the goal")
-            rob.goal_in_front(False)
-            return
+            if(not state_machine):
+                faceGoal(True, rob)
+                sideways_control = saturation_function(camera_Kp * 640,
+                                                   max_forward, max_backward, .2)
+            else:
+                rob.goal_in_front(False)
+                return
 ##            faceGoal(True, rob)
 ##            continue
 
