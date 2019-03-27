@@ -5,7 +5,7 @@ def follow_right(state_machine, rob):
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
-    desired_distance = (10*0.393701)
+    desired_distance = 5
     # Proportional gain
     Kp = 2
 
@@ -16,7 +16,8 @@ def follow_right(state_machine, rob):
         f_distance = rob.distance_sensor.get_front_inches()
 
         if (f_distance >= (desired_distance)):
-            if (rob.check_goal_in_front()):
+            rob.check_goal_in_front()
+            if (rob.blob_x < 320):
                 #check if goal in front
                 #check if no wall in front
                 print("Goal is in front and getting close to it.")

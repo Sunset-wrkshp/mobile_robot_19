@@ -9,6 +9,7 @@ class Robot():
         self.encoder.calibrateSpeeds()
         self.distance_sensor = DistanceSensor()
         self.camera = Camera()
+        self.blob_x = -1000
         signal.signal(signal.SIGINT, self.ctrlC)
         self.GIF = None
         self.no_wall = None
@@ -74,6 +75,7 @@ class Robot():
 
         for x in range (0,20):
             if len(blobs) > 0:
+                self.blob_x = blobs[largest].pt[0]
                 if ((Kp * (blobs[largest].pt[0] - 320)) > -ERROR) and ((Kp * (blobs[largest].pt[0] - 320)) < ERROR):
                     if ((Kp* (blobs[largest].pt[1] - 240) > -2*ERROR) and ((Kp * (blobs[largest].pt[1] - 240)) < 2*ERROR)):
 ##                        self.goal_in_front(True)
@@ -88,6 +90,7 @@ class Robot():
                     print("GIF False goal center not in error range")
                     t_set.append(False)
             else:
+                self.blob_x = 1000
 ##                self.goal_in_front(False)
                 print("GIF False no blobs")
                 t_set.append(False)
@@ -102,7 +105,7 @@ class Robot():
         f_distance = self.distance_sensor.get_front_inches()
         GIF = self.check_goal_in_front()
         if (GIF):
-            if (f_distance > 3*(10*0.393701)):
+            if (f_distance > 3*5):
                 print("GIF but also a wall")
                 self.no_wall_detected(True)
                 return True
