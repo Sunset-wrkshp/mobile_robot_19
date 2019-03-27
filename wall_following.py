@@ -15,14 +15,15 @@ def follow_right(state_machine, rob):
         r_distance = rob.distance_sensor.get_right_inches()
         f_distance = rob.distance_sensor.get_front_inches()
 
-        if (f_distance >= (desired_distance) and rob.check_goal_in_front()):
-            #check if goal in front
-            #check if no wall in front
-            print("Goal is in front and getting close to it.")
-            rob.goal_in_front(True)
-            rob.no_wall_detected(True)
-            rob.encoder.setSpeedsIPS(0,0)
-            return
+        if (f_distance >= (desired_distance)):
+            if (rob.check_goal_in_front()):
+                #check if goal in front
+                #check if no wall in front
+                print("Goal is in front and getting close to it.")
+                rob.goal_in_front(True)
+##                rob.no_wall_detected(True)
+                rob.encoder.setSpeedsIPS(0,0)
+                return
 
         r_proportional_control = saturation_function(Kp * (desired_distance - r_distance),
                                                         max_forward, max_backward)

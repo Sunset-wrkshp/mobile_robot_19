@@ -61,6 +61,8 @@ class Robot():
 
         ERROR = 0.5
         Kp = 0.009
+        
+        t_set = []
 
         #Find largest blob
         largest = -1
@@ -70,23 +72,30 @@ class Robot():
                 size = blobs[i].size
                 largest = i
 
-        if len(blobs) > 0:
-            if ((Kp * (blobs[largest].pt[0] - 320)) > -ERROR) and ((Kp * (blobs[largest].pt[0] - 320)) < ERROR):
-                if ((Kp* (blobs[largest].pt[1] - 240) > -2*ERROR) and ((Kp * (blobs[largest].pt[1] - 240)) < 2*ERROR)):
-                    self.goal_in_front(True)
-                    print("GIF True")
-                    return True
+        for x in range (0,20):
+            if len(blobs) > 0:
+                if ((Kp * (blobs[largest].pt[0] - 320)) > -ERROR) and ((Kp * (blobs[largest].pt[0] - 320)) < ERROR):
+                    if ((Kp* (blobs[largest].pt[1] - 240) > -2*ERROR) and ((Kp * (blobs[largest].pt[1] - 240)) < 2*ERROR)):
+##                        self.goal_in_front(True)
+                        print("GIF True")
+                        t_set.append(True)
+                    else:
+##                        self.goal_in_front(False)
+                        print("GIF False because too high")
+                        t_set.append(False)
                 else:
-                    self.goal_in_front(False)
-                    print("GIF False because too high")
-                    return False
+##                    self.goal_in_front(False)
+                    print("GIF False goal center not in error range")
+                    t_set.append(False)
             else:
-                self.goal_in_front(False)
-                print("GIF False goal not in range")
-                return False
+##                self.goal_in_front(False)
+                print("GIF False no blobs")
+                t_set.append(False)
+        if any(t_set):
+            self.goal_in_front(True)
+            return True
         else:
             self.goal_in_front(False)
-            print("GIF False no blobs")
             return False
 
     def check_no_wall_in_front(self):
