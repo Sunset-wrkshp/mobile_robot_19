@@ -11,8 +11,8 @@ import math
 import calib_io as calib
 
 class Encoder():
-    TESTING = False
-    TEST_WRITE = False
+    TESTING = True
+    TEST_WRITE = True
     step_count = ()
     LENCODER = 17
     RENCODER = 18
@@ -34,7 +34,7 @@ class Encoder():
     def __init__(self):
         self.step_count = (0,0)
         # Attach the Ctrl+C signal interrupt
-        #signal.signal(signal.SIGINT, self.ctrlC)
+        signal.signal(signal.SIGINT, self.ctrlC_sig)
 
         # Set the pin numbering scheme to the numbering shown on the robot itself.
         GPIO.setmode(GPIO.BCM)
@@ -78,11 +78,17 @@ class Encoder():
     def stop(self):
         self.pwm.set_pwm(self.RSERVO, 0, 0)
         self.pwm.set_pwm(self.LSERVO, 0, 0)
+        exit()
 
     # This function is called when Ctrl+C is pressed.
     # It's intended for properly exiting the program.
     def ctrlC(self):
         print("Exiting encoder class")
+        self.stop()
+        GPIO.cleanup()
+        
+    def ctrlC_sig(self, signum, frame):
+        print("SIGINT")
         self.stop()
         GPIO.cleanup()
 
@@ -270,14 +276,14 @@ if __name__ == "__main__":
         d.calibrateSpeeds()
         print(d.calibrated_speeds)
 
-        time.sleep(5)
-        print("set speed")
-        test = .357
-        print("testing RPS: {test}".format(test = test))
-        d.setSpeedsRPS(test, test)
-        time.sleep(3)
-        d.stop()
-        time.sleep(2)
+##        time.sleep(5)
+##        print("set speed")
+##        test = .357
+##        print("testing RPS: {test}".format(test = test))
+##        d.setSpeedsRPS(test, test)
+##        time.sleep(3)
+##        d.stop()
+##        time.sleep(2)
 
         # time.sleep(5)
         # print("set speed")
