@@ -15,7 +15,7 @@ def follow_right(state_machine, rob):
         r_distance = rob.distance_sensor.get_right_inches()
         f_distance = rob.distance_sensor.get_front_inches()
 
-        if (f_distance >= (desired_distance)):
+        if (state_machine and (f_distance >= (desired_distance))):
             rob.check_goal_in_front()
             if (rob.blob_x < 320):
                 #check if goal in front
@@ -49,7 +49,7 @@ def follow_right(state_machine, rob):
         time.sleep(0.01)
 
 
-def follow_left(rob):
+def follow_left(state_machine, rob):
     #rob = Robot()
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
@@ -96,7 +96,7 @@ def main():
     if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
         follow_right(False,rob)
     else:
-        follow_right(False,rob)
+        follow_left(False,rob)
 
 ## Main program
 if __name__ == "__main__":
