@@ -78,7 +78,7 @@ class Encoder():
     def stop(self):
         self.pwm.set_pwm(self.RSERVO, 0, 0)
         self.pwm.set_pwm(self.LSERVO, 0, 0)
-        exit()
+##        exit()
 
     # This function is called when Ctrl+C is pressed.
     # It's intended for properly exiting the program.
@@ -91,6 +91,7 @@ class Encoder():
         print("SIGINT")
         self.stop()
         GPIO.cleanup()
+        exit()
 
     # Initalizes Encoders
     # Is this needed?
