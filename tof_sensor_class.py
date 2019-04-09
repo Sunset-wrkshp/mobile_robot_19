@@ -62,8 +62,8 @@ class DistanceSensor():
             return self.fSensor.get_distance() / 25.4
 
     def get_left_inches(self):
-        if (self.lSensor.get_distance() / 25.4) > 40:
-            return 40.0
+        if (self.lSensor.get_distance() / 25.4) > 35:
+            return 35.0
         else:
             return self.lSensor.get_distance() / 25.4
 
@@ -78,3 +78,9 @@ class DistanceSensor():
         self.lSensor.stop_ranging()
         self.fSensor.stop_ranging()
         self.rSensor.stop_ranging()
+        
+if __name__ == "__main__":
+    rob = DistanceSensor()
+    for x in range(0,100):
+        print("{0}cm {1}in".format(rob.lSensor.get_distance(), rob.get_left_inches()))
+        

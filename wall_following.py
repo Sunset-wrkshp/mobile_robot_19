@@ -56,9 +56,9 @@ def follow_left(state_machine, rob):
 
     desired_distance = 5
     # Proportional gain
-    Kp = 2
+    Kp = 4.7
 
-##    user_input = input("Place robot beside wall and press enter to continue.")
+    user_input = input("Place robot beside wall and press enter to continue.")
 
     while (True):
         l_distance = rob.distance_sensor.get_left_inches()
@@ -73,6 +73,10 @@ def follow_left(state_machine, rob):
             rob.encoder.setSpeedsIPS(max_forward, min(max_forward + l_proportional_control, f_proportional_control,
                                         max_forward))
         else:
+            print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(l_distance,
+                                                                                        min(max_forward - l_proportional_control, max_forward),
+                                                                                        rob.distance_sensor.get_right_inches(),
+                                                                                        min(max_forward + l_proportional_control, max_forward)))
             rob.encoder.setSpeedsIPS(min(max_forward - l_proportional_control, max_forward),
                                     min(max_forward + l_proportional_control, max_forward))
         time.sleep(0.01)
