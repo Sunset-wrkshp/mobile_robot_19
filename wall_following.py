@@ -56,7 +56,7 @@ def follow_left(state_machine, rob):
 
     desired_distance = 5
     # Proportional gain
-    Kp = 4.7
+    Kp = 2
 
 ##    user_input = input("Place robot beside wall and press enter to continue.")
 
@@ -94,7 +94,7 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
 def main():
     rob = Robot()
     if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
-        follow_right(False,rob)
+        follow_left(False,rob)
     else:
         follow_left(False,rob)
 
