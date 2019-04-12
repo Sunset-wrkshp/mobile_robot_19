@@ -2,5 +2,5 @@
 
 from robot_class import Robot
 
-rob = Robot(True)
+rob = Robot()
 rob.stop()

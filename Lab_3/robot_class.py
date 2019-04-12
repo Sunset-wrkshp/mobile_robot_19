@@ -4,10 +4,9 @@ from camera_class import Camera
 import signal
 
 class Robot():
-    def __init__(self, skip = False):
+    def __init__(self):
         self.encoder = Encoder()
-        if skip is False:
-            self.encoder.calibrateSpeeds()
+        self.encoder.calibrateSpeeds()
         self.distance_sensor = DistanceSensor()
         self.camera = Camera()
         self.blob_x = -1000
@@ -113,9 +112,3 @@ class Robot():
             else:
                 self.no_wall_detected(False)
                 return False
-
-## Main program
-if __name__ == "__main__":
-    rob=Robot()
-    rob.stop()
-    

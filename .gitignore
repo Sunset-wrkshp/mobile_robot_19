@@ -107,3 +107,4 @@ venv.bak/
 #Manual Additions
 /Task 1
 calibration.txt
+*.save
