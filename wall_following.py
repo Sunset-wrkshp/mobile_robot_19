@@ -1,4 +1,4 @@
-from robot_class import Robot
+#from robot_class import Robot
 import time as time
 
 def follow_right(state_machine, rob):
@@ -104,9 +104,10 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
     else:
         return 0
 
-def follow_both(rob=None):
-    if rob is None:
-        rob = Robot()
+def follow_both(rob=None, next_cell=None):
+    if rob is None or next_cell is None:
+        print("Error:Robot object was not passed")
+        exit()
     while(next_cell.move_to_cell()):
         print("moving to cell")
         if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():

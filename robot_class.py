@@ -232,7 +232,7 @@ class Robot():
 
         if True:
             self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
-            follow_both(self)
+            follow_both(self, next_cell)
             # while next_cell.move_to_cell():
             #     print("moving to cell")
             #     time.sleep(0.1)
