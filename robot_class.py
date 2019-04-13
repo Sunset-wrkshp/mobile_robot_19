@@ -214,7 +214,7 @@ class Robot():
 
     def forward(self):
         rotations = (self.cell_size / 2) / (self.encoder.WDIAMETER * math.pi)
-        ticks = int(rotations * 32)
+        ticks = int(rotations * 32 + 5)
         self.encoder.step_count = (0, 0)
         self.encoder.steps_to_move = [ticks, ticks]
         next_cell = NextCell(self, (self.distance_sensor.get_left_inches() < self.cell_size),
