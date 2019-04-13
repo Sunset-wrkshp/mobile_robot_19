@@ -8,7 +8,7 @@ def follow_right(state_machine, rob):
 
     desired_distance = 9
     # Proportional gain
-    Kp = 4.7
+    Kp = .5
 
 ##    user_input = input("Place robot beside wall and press enter to continue.")
 
@@ -45,10 +45,10 @@ def follow_right(state_machine, rob):
                                     max_forward)
         else:
             #No front wall detected
-            print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(r_distance,
-                                                                                        min(max_forward - r_proportional_control, max_forward),
-                                                                                        rob.distance_sensor.get_left_inches(),
-                                                                                        min(max_forward + r_proportional_control, max_forward)))
+##            print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(r_distance,
+##                                                                                        min(max_forward - r_proportional_control, max_forward),
+##                                                                                        rob.distance_sensor.get_left_inches(),
+##                                                                                        min(max_forward + r_proportional_control, max_forward)))
             print("Wall following")
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
                                     min(max_forward - r_proportional_control, max_forward))
@@ -63,7 +63,7 @@ def follow_left(state_machine, rob):
 
     desired_distance = 9
     # Proportional gain
-    Kp = 2
+    Kp = .5
 
     #user_input = input("Place robot beside wall and press enter to continue.")
 
@@ -82,10 +82,10 @@ def follow_left(state_machine, rob):
     if l_distance < 0:
         pass
     else:
-        print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(l_distance,
-                                                                                    min(max_forward - l_proportional_control, max_forward),
-                                                                                    rob.distance_sensor.get_right_inches(),
-                                                                                    min(max_forward + l_proportional_control, max_forward)))
+##        print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(l_distance,
+##                                                                                    min(max_forward - l_proportional_control, max_forward),
+##                                                                                    rob.distance_sensor.get_right_inches(),
+##                                                                                    min(max_forward + l_proportional_control, max_forward)))
         rob.encoder.setSpeedsIPS(min(max_forward - l_proportional_control, max_forward),
                                 min(max_forward + l_proportional_control, max_forward))
     time.sleep(0.01)
@@ -114,9 +114,18 @@ def follow_both(rob=None, next_cell=None):
             follow_right(False,rob)
         else:
             follow_left(False,rob)
-        time.sleep(0.1)
+##        time.sleep(0.1)
 
+def main():
+    from robot_class import Robot
+    rob = Robot()
+    while(True):
+        if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
+            follow_right(False,rob)
+        else:
+            follow_left(False,rob)
+        
 
 ## Main program
 if __name__ == "__main__":
-    follow_both()
+    main()
