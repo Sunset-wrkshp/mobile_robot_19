@@ -4,7 +4,7 @@ from camera_class import Camera
 import signal
 import math
 import time
-#from wall_following import *
+from wall_following import follow_both
 
 class Robot():
     def __init__(self, skip = False):
@@ -69,7 +69,7 @@ class Robot():
 
         ERROR = 0.5
         Kp = 0.009
-        
+
         t_set = []
 
         #Find largest blob
@@ -232,9 +232,10 @@ class Robot():
 
         if True:
             self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
-            while next_cell.move_to_cell():
-                print("moving to cell")
-                time.sleep(0.1)
+            follow_both(self)
+            # while next_cell.move_to_cell():
+            #     print("moving to cell")
+            #     time.sleep(0.1)
 
             self.encoder.step_count = (0, 0)
             self.encoder.steps_to_move = [ticks, ticks]
@@ -301,4 +302,3 @@ class NextCell:
 if __name__ == "__main__":
     rob=Robot()
     rob.stop()
-    

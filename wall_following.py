@@ -104,14 +104,18 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
     else:
         return 0
 
-def main():
-    rob = Robot()
-    while(True):
+def follow_both(rob=None):
+    if rob is None:
+        rob = Robot()
+    while(next_cell.move_to_cell()):
+        print("moving to cell")
         if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
             follow_right(False,rob)
         else:
             follow_left(False,rob)
+        time.sleep(0.1)
+
 
 ## Main program
 if __name__ == "__main__":
-    main()
+    follow_both()
