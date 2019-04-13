@@ -2,7 +2,7 @@
 import time as time
 
 def follow_right(state_machine, rob):
-    print("following right")
+##    print("following right")
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
@@ -49,7 +49,7 @@ def follow_right(state_machine, rob):
 ##                                                                                        min(max_forward - r_proportional_control, max_forward),
 ##                                                                                        rob.distance_sensor.get_left_inches(),
 ##                                                                                        min(max_forward + r_proportional_control, max_forward)))
-            print("Wall following")
+##            print("Wall following")
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
                                     min(max_forward - r_proportional_control, max_forward))
     time.sleep(0.01)
@@ -57,7 +57,7 @@ def follow_right(state_machine, rob):
 
 def follow_left(state_machine, rob):
     #rob = Robot()
-    print("following left")
+##    print("following left")
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 

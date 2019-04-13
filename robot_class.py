@@ -214,7 +214,7 @@ class Robot():
 
     def forward(self):
         rotations = (self.cell_size / 2) / (self.encoder.WDIAMETER * math.pi)
-        ticks = int(rotations * 32 + 5)
+        ticks = int(rotations * 32)
         self.encoder.step_count = (0, 0)
         self.encoder.steps_to_move = [ticks, ticks]
         next_cell = NextCell(self, (self.distance_sensor.get_left_inches() < self.cell_size),
@@ -231,6 +231,7 @@ class Robot():
         # else:
 
         if True:
+            input()
             self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
             follow_both(self, next_cell)
             # while next_cell.move_to_cell():
@@ -240,9 +241,17 @@ class Robot():
             self.encoder.step_count = (0, 0)
             self.encoder.steps_to_move = [ticks, ticks]
             time.sleep(0.1)
-            self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
+            follow_both(self, next_cell)
+##            self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
             while next_cell.center_in_cell():
                 # print("Centering in cell")
+##                distance = self.distance_sensor.get_front_inches()
+##                proportional_control = saturation_function(Kp * (desired_distance - distance),
+##                                                        rob.encoder.get_max_forward_speed(),
+##                                                        rob.encoder.get_max_backward_speed())
+##                rob.encoder.setSpeedsIPS(proportional_control, proportional_control)
+####                time.sleep(0.01)
+##                
                 time.sleep(0.1)
             self.encoder.stop()
 
