@@ -3,10 +3,11 @@ import math
 from threading import Thread
 from os import system
 import time
+from robot_class import *
 
 
 class Mapper:
-    def __init__(self, rob=False, start_x = 0, start_y = 0, end_x = 0, end_y = 0):
+    def __init__(self, rob, start_x = 0, start_y = 0, end_x = 0, end_y = 0):
         self.rob = rob
         self.current_x = start_x
         self.current_y = start_y
@@ -44,25 +45,25 @@ class Mapper:
                 return distances
 
             # check up
-            if "n" not in self.walls[cell_y][cell_x]:
+            if (cell_y > 0) and ("n" not in self.walls[cell_y][cell_x]):
                 if distances[cell_y - 1][cell_x] == -1:
                     wave_queue.append([cell_x, cell_y - 1])
                     distances[cell_y - 1][cell_x] = distances[cell_y][cell_x] + 1
 
             # check right
-            if "e" not in self.walls[cell_y][cell_x]:
+            if (cell_x < 3) and ("e" not in self.walls[cell_y][cell_x]):
                 if distances[cell_y][cell_x + 1] == -1:
                     wave_queue.append([cell_x + 1, cell_y])
                     distances[cell_y][cell_x + 1] = distances[cell_y][cell_x] + 1
 
             # check down
-            if "s" not in self.walls[cell_y][cell_x]:
+            if (cell_y < 3) and ("s" not in self.walls[cell_y][cell_x]):
                 if distances[cell_y + 1][cell_x] == -1:
                     wave_queue.append([cell_x, cell_y + 1])
                     distances[cell_y + 1][cell_x] = distances[cell_y][cell_x] + 1
 
             # check left
-            if "w" not in self.walls[cell_y][cell_x]:
+            if (cell_x > 0) and ("w" not in self.walls[cell_y][cell_x]):
                 if distances[cell_y][cell_x - 1] == -1:
                     wave_queue.append([cell_x - 1, cell_y])
                     distances[cell_y][cell_x - 1] = distances[cell_y][cell_x] + 1
@@ -75,26 +76,26 @@ class Mapper:
         cell_x = self.current_x
         cell_y = self.current_y
         path = []
-        while cell != self.end_cell:
+        while (cell_x != self.end_x) or (cell_y != self.end_y):
             north = float("inf")
             south = float("inf")
             east = float("inf")
             west = float("inf")
 
             # check up
-            if ("n" not in self.walls[cell_y][cell_x]) and (distances[cell_y - 1][cell_x] != -1):
+            if (cell_y > 0) and ("n" not in self.walls[cell_y][cell_x]) and (distances[cell_y - 1][cell_x] != -1):
                 north = distances[cell_y - 1][cell_x]
 
             # check left
-            if ("e" not in self.walls[cell_y][cell_x]) and (distances[cell_y][cell_x + 1] != -1):
+            if (cell_x < 3) and ("e" not in self.walls[cell_y][cell_x]) and (distances[cell_y][cell_x + 1] != -1):
                 east = distances[cell_y][cell_x + 1]
 
             # check down
-            if ("s" not in self.walls[cell_y][cell_x]) and (distances[cell_y + 1][cell_x] != -1):
+            if (cell_y < 3) and ("s" not in self.walls[cell_y][cell_x]) and (distances[cell_y + 1][cell_x] != -1):
                 south = distances[cell_y + 1][cell_x]
 
             # check right
-            if ("w" not in self.walls[cell_y][cell_x]) and (distances[cell_y][cell_x - 1] != -1):
+            if (cell_x > 0) and ("w" not in self.walls[cell_y][cell_x]) and (distances[cell_y][cell_x - 1] != -1):
                 west = distances[cell_y][cell_x - 1]
 
             min_dist = min(north, south, east, west)
@@ -151,10 +152,10 @@ class Mapper:
         return
 
     def localization(self):
-        Localization_Menu()
+        localization = Localization_Menu(self)
 
     def mapping(self):
-        Mapping_Menu()
+        mapping = Mapping_Menu(self)
 
     def path_planning(self):
         return
@@ -166,6 +167,7 @@ class Mapper:
 
     def main_menu(self):
         user_input = 'C'
+        system('clear')
         while user_input.lower() != 'q':
             print("********************")
             print("Main Menu")
@@ -187,6 +189,7 @@ class Mapper:
                 self.mapping()
             elif user_input.lower() == 'p':
                 self.path_planning()
+        self.rob.stop()
 
 
 class Mapping_Menu:
@@ -205,6 +208,8 @@ class Mapping_Menu:
         self.add_walls()
 
         while self.user_input == None:
+            system('clear')
+            self.mapper.draw_map()
             search_x = 0
             search_y = 0
             while (self.mapper.mapped_cells[search_y][search_x]) and (search_y < 4):
@@ -216,6 +221,8 @@ class Mapping_Menu:
                     search_y += 1
                     search_x = 0
             if (search_y >= 4) or (search_x >= 4):
+                system('clear')
+                self.mapper.draw_map()
                 print("All cells mapped. Press any key to continue.")
                 return
             self.mapper.end_x = search_x
@@ -224,6 +231,8 @@ class Mapping_Menu:
 
             for direction in path:
                 if self.user_input != None:
+                    system('clear')
+                    self.mapper.draw_map()
                     print("Press any key to continue.")
                     return
 
@@ -231,7 +240,7 @@ class Mapping_Menu:
                 self.mapper.rob.change_orientation(direction)
 
                 # A wall is blocking the path
-                if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.cell_size:
+                if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
                     break
                 # No wall, continue
                 else:
@@ -253,6 +262,8 @@ class Mapping_Menu:
                 self.mapper.mapped_cells[search_y][search_x] = True
 
         if self.user_input != None:
+            system('clear')
+            self.mapper.draw_map()
             print("Press any key to continue.")
             return
 
@@ -354,15 +365,19 @@ class Mapping_Menu:
         left_dir = self.mapper.rob.get_left_dir()
         right_dir = self.mapper.rob.get_right_dir()
 
-        if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.cell_size) and (
-                front_dir not in self.mapper.walls[self.mapper.current_cell]):
+        if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance) and (
+                front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
+            print("front wall found")
             self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
         if (self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.cell_size) and (
-                left_dir not in self.mapper.walls[current_cell]):
+                left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
+            print("left wall found")
             self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
         if (self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.cell_size) and (
-                right_dir not in self.mapper.walls[self.mapper.current_cell]):
+                right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
+            print("right wall found")
             self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
+        print("******")
 
 class Localization_Menu:
     def __init__(self, mapper):
@@ -394,7 +409,9 @@ class Localization_Menu:
 
 if __name__ == "__main__":
     #t1 = threading.Thread(target=main_menu, args=())
-    main_menu()
+    rob = Robot()
+    mapper = Mapper(rob)
+    mapper.main_menu()
 
 # root = Tk()
 # myframe = Frame(root)
