@@ -43,6 +43,10 @@ def follow_right(state_machine, rob):
                                         max_forward)
             else:
                 #No front wall detected
+                print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(r_distance,
+                                                                                            min(max_forward - r_proportional_control, max_forward),
+                                                                                            rob.distance_sensor.left_inches(),
+                                                                                            min(max_forward + r_proportional_control, max_forward)))
                 print("Wall following")
                 rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
                                         min(max_forward - r_proportional_control, max_forward))
