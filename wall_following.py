@@ -8,7 +8,7 @@ def follow_right(state_machine, rob):
 
     desired_distance = 9
     # Proportional gain
-    Kp = 4
+    Kp = 2
 
 ##    user_input = input("Place robot beside wall and press enter to continue.")
 
@@ -32,7 +32,8 @@ def follow_right(state_machine, rob):
     f_proportional_control = saturation_function(Kp * (desired_distance - min(f_distance, r_distance)),
                                                     max_forward, max_backward)
 
-    if f_distance < (desired_distance * 2):
+    if (f_distance < 0):
+##    if f_distance < (desired_distance * 2):
         #front wall is deteced withing distance*2 inches. Starts to turn
         print("Turning")
         rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control,
@@ -46,7 +47,7 @@ def follow_right(state_machine, rob):
             #No front wall detected
             print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(r_distance,
                                                                                         min(max_forward - r_proportional_control, max_forward),
-                                                                                        rob.distance_sensor.left_inches(),
+                                                                                        rob.distance_sensor.get_left_inches(),
                                                                                         min(max_forward + r_proportional_control, max_forward)))
             print("Wall following")
             rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
@@ -62,22 +63,24 @@ def follow_left(state_machine, rob):
 
     desired_distance = 9
     # Proportional gain
-    Kp = 4.7
+    Kp = 2
 
-    user_input = input("Place robot beside wall and press enter to continue.")
+    #user_input = input("Place robot beside wall and press enter to continue.")
 
 
     l_distance = rob.distance_sensor.get_left_inches()
-    f_distance = rob.distance_sensor.get_front_inches()
+    #f_distance = rob.distance_sensor.get_front_inches()
 
     l_proportional_control = saturation_function(Kp * (desired_distance - l_distance),
                                                     max_forward, max_backward)
-    f_proportional_control = saturation_function(Kp * (desired_distance - min(f_distance, l_distance)),
-                                                    max_forward, max_backward)
+    #f_proportional_control = saturation_function(Kp * (desired_distance - min(f_distance, l_distance)),
+##                                                    max_forward, max_backward)
 
-    if f_distance < (desired_distance * 2):
-        rob.encoder.setSpeedsIPS(max_forward, min(max_forward + l_proportional_control, f_proportional_control,
-                                    max_forward))
+##    if f_distance < (desired_distance * 2):
+##        rob.encoder.setSpeedsIPS(max_forward, min(max_forward + l_proportional_control, f_proportional_control,
+##                                    max_forward))
+    if l_distance < 0:
+        pass
     else:
         print("WF\n l_distance:{0}, l_speed:{1}\nr_distance:{2} r_speed:{3}".format(l_distance,
                                                                                     min(max_forward - l_proportional_control, max_forward),
