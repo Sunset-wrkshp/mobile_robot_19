@@ -21,7 +21,7 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
 def main(demonstrating):
     rob = Robot()
 
-    desired_distance = 5
+    desired_distance = 9
     # Proportional gain
     Kp = 1.5
 

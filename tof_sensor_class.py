@@ -56,25 +56,33 @@ class DistanceSensor():
 
     # Returns sensor input conveted from mm to inches
     def get_front_inches(self):
-        if (self.fSensor.get_distance() / 25.4) > 40:
+        f_distance = self.fSensor.get_distance()
+        if (f_distance / 25.4) > 40:
             return 40.0
         else:
-            return self.fSensor.get_distance() / 25.4
+            return f_distance / 25.4
 
     def get_left_inches(self):
-        if (self.lSensor.get_distance() / 25.4) > 40:
-            return 40.0
+        l_distance = self.lSensor.get_distance()
+        if (l_distance / 25.4) > 35:
+            return 35.0
         else:
-            return self.lSensor.get_distance() / 25.4
+            return l_distance / 25.4
 
     def get_right_inches(self):
-        if (self.rSensor.get_distance() / 25.4) > 40:
+        r_distance = self.rSensor.get_distance()
+        if (r_distance / 25.4) > 40:
             return 40.0
         else:
-            return self.rSensor.get_distance() / 25.4
+            return r_distance / 25.4
 
     def ctrlC(self):
         print("Stopping sensors")
         self.lSensor.stop_ranging()
         self.fSensor.stop_ranging()
         self.rSensor.stop_ranging()
+
+if __name__ == "__main__":
+    rob = DistanceSensor()
+    for x in range(0,100):
+        print("{0}cm {1}in".format(rob.lSensor.get_distance(), rob.get_left_inches()))
