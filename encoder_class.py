@@ -33,6 +33,7 @@ class Encoder():
 
     def __init__(self):
         self.step_count = (0,0)
+        self.steps_to_move = (-1, -1)
         # Attach the Ctrl+C signal interrupt
         signal.signal(signal.SIGINT, self.ctrlC_sig)
 
@@ -65,6 +66,9 @@ class Encoder():
         # Record the time when the encoders are ticked
         self.prev_tick_time[0] = self.last_tick_time[0]
         self.last_tick_time[0] = time.monotonic()
+        if self.step_count[0] == self.steps_to_move[0]:
+            self.steps_to_move = [-1, -1]
+            self.stop()
 
     # This function is called when the right encoder detects a rising edge signal.
     def onRightEncode(self, pin):
@@ -73,6 +77,9 @@ class Encoder():
         self.step_count = (self.step_count[0], self.step_count[1]+1)
         self.prev_tick_time[1] = self.last_tick_time[1]
         self.last_tick_time[1] = time.monotonic()
+        if self.step_count[1] == self.steps_to_move[1]:
+            self.steps_to_move = [-1, -1]
+            self.stop()
 
     # Just stops the robot
     def stop(self):
