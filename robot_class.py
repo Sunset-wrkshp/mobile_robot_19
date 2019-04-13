@@ -4,7 +4,7 @@ from camera_class import Camera
 import signal
 import math
 import time
-from wall_following import follow_both
+from wall_following import follow_both, saturation_function
 
 class Robot():
     def __init__(self, skip = False):
@@ -231,7 +231,7 @@ class Robot():
         # else:
 
         if True:
-            input()
+            input("Enter to WF")
             self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
             follow_both(self, next_cell)
             # while next_cell.move_to_cell():
@@ -243,16 +243,17 @@ class Robot():
             time.sleep(0.1)
             follow_both(self, next_cell)
 ##            self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
+            input("Enter to Center")
             while next_cell.center_in_cell():
-                # print("Centering in cell")
-##                distance = self.distance_sensor.get_front_inches()
-##                proportional_control = saturation_function(Kp * (desired_distance - distance),
-##                                                        rob.encoder.get_max_forward_speed(),
-##                                                        rob.encoder.get_max_backward_speed())
-##                rob.encoder.setSpeedsIPS(proportional_control, proportional_control)
-####                time.sleep(0.01)
+                print("Centering in cell")
+                distance = self.distance_sensor.get_front_inches()
+                proportional_control = saturation_function(1.5 * ((self.cell_size / 2 ) - distance),
+                                                        self.encoder.get_max_forward_speed(),
+                                                        self.encoder.get_max_backward_speed())
+                self.encoder.setSpeedsIPS(proportional_control, proportional_control)
+                time.sleep(0.01)
 ##                
-                time.sleep(0.1)
+##                time.sleep(0.1)
             self.encoder.stop()
 
 
