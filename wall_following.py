@@ -8,7 +8,7 @@ def follow_right(state_machine, rob):
 
     desired_distance = 9
     # Proportional gain
-    Kp = 2
+    Kp = 4.7
 
 ##    user_input = input("Place robot beside wall and press enter to continue.")
 
