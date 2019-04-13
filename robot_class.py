@@ -212,13 +212,14 @@ class Robot():
                 self.rotate('r')
 
     def forward(self):
-        rotations = (self.cell_size / 2) / self.encoder.WDIAMETER
+        rotations = (self.cell_size / 2) / (self.encoder.WDIAMETER * math.pi)
         ticks = int(rotations * 32)
         self.encoder.step_count = (0, 0)
         self.encoder.steps_to_move = [ticks, ticks]
         next_cell = NextCell(self, self.distance_sensor.get_front_inches(),
                                         (self.distance_sensor.get_left_inches() < self.cell_size),
                                         (self.distance_sensor.get_right_inches() < self.cell_size))
+        #print(self.distance_sensor.get_front_inches())
 
         # if self.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 2):
         #     if self.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 2):
@@ -232,14 +233,14 @@ class Robot():
         if True:
             self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
             while next_cell.move_to_cell():
-                #print("moving to cell")
+                print("moving to cell")
                 time.sleep(0.1)
 
             self.encoder.step_count = (0, 0)
             self.encoder.steps_to_move = [ticks, ticks]
             next_cell.initial_distance = self.distance_sensor.get_front_inches()
             while next_cell.center_in_cell():
-                #print("Centering in cell")
+                print("Centering in cell")
                 time.sleep(0.1)
             self.encoder.stop()
 
@@ -255,23 +256,34 @@ class NextCell:
     # used for moving to the next cell
     # returns false if robot should stop
     def move_to_cell(self):
-        if self.rob.distance_sensor.get_front_inches() < (self.initial_distance - 9):
+        if self.rob.distance_sensor.get_front_inches() < (self.rob.cell_size / 2):
+            #print(self.initial_distane)
+            #print(self.rob.distance_sensor.get_front_inches())
             return False
         if self.left_wall_detected:
             if self.rob.distance_sensor.get_left_inches() > self.rob.cell_size:
+                print("left wall not found")
                 return False
         else:
             if self.rob.distance_sensor.get_left_inches() < self.rob.cell_size:
+                print("new left wall found")
                 return False
 
         if self.right_wall_detected:
             if self.rob.distance_sensor.get_right_inches() > self.rob.cell_size:
+                print("right wall not found")
                 return False
         else:
              if self.rob.distance_sensor.get_right_inches() < self.rob.cell_size:
+                 print("new right wall found")
                  return False
         if self.rob.encoder.steps_to_move[0] == -1:
+            print("encoder ticks -1")
             return False
+        else:
+            print(self.rob.encoder.step_count[0])
+            print(self.rob.encoder.steps_to_move[0])
+            print()
         return True
 
     # Used for centering robot in a cell
