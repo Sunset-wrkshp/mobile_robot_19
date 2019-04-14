@@ -27,8 +27,13 @@ class Camera():
 
     # Default HSV ranges
     # Note: the range for hue is 0-180, not 0-255
-    minH = 160; minS = 120; minV =   0;
-    maxH = 180; maxS = 210; maxV = 255;
+    # minH maxH minS maxS minV maxV
+    color_0 = {'minH': 160, 'minS': 120, 'minV': 0,
+               'maxH': 180, 'maxS': 210, 'maxV': 255}
+    color_1 = {'minH': 160, 'minS': 120, 'minV': 0,
+               'maxH': 180, 'maxS': 210, 'maxV': 255}
+    # minH = 160; minS = 120; minV =   0;
+    # maxH = 180; maxS = 210; maxV = 255;
 
     def __init__(self):
         # Initialize the threaded camera
@@ -59,17 +64,24 @@ class Camera():
             # Create windows
             cv.namedWindow(self.WINDOW)
 
-    def get_blobs(self):
+    def get_blobs(self, id=0):
+        color = {}
+
+        if (id == 0):
+            color = self.color_0
+        elif (id == 1):
+            color = self.color_1
+
+
         # Get a frame
         frame = self.camera.read()
 
         # Blob detection works better in the HSV color space
-
         # (than the RGB color space) so the frame is converted to HSV.
         frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         # Create a mask using the given HSV range
-        mask = cv.inRange(frame_hsv, (self.minH, self.minS, self.minV), (self.maxH, self.maxS, self.maxV))
+        mask = cv.inRange(frame_hsv, (self.color[minH], self.color[minS], self.color[minV]), (self.color[maxH], self.color[maxS], self.color[maxV]))
 
         # Run the SimpleBlobDetector on the mask.
         # The results are stored in a vector of 'KeyPoint' objects,
@@ -90,4 +102,3 @@ class Camera():
     def ctrlC(self):
         print("Stopping camera")
         self.stop()
-
