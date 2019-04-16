@@ -1,7 +1,7 @@
 from tkinter import *
 import math
 from threading import Thread
-from os import system
+from os import system, path
 import time
 from robot_class import *
 
@@ -22,6 +22,7 @@ class Mapper:
                              [False, False, False, False],
                              [False, False, False, False],
                              [False, False, False, False]]
+        self.color_locations = [[], [], [], []]
 
     def xy_to_cell(self, cell_x, cell_y):
         return (cell_y * 4) + cell_x
@@ -41,8 +42,8 @@ class Mapper:
             cell_num = self.xy_to_cell(cell_x, cell_y)
             wave_queue.pop(0)
 
-            if (cell_x == self.current_x) and (cell_y == self.current_y):
-                return distances
+            # if (cell_x == self.current_x) and (cell_y == self.current_y):
+            #     return distances
 
             # check up
             if (cell_y > 0) and ("n" not in self.walls[cell_y][cell_x]):
@@ -68,6 +69,7 @@ class Mapper:
                     wave_queue.append([cell_x - 1, cell_y])
                     distances[cell_y][cell_x - 1] = distances[cell_y][cell_x] + 1
 
+        print(distances)
         return distances
 
     def movement_planner(self):
@@ -132,23 +134,31 @@ class Mapper:
 
         for x in range(4):
             for y in range(4):
-                if 'n' in self.walls[y][x]:
-                    map[(y * 3)] = map[(y * 3)][0:(x * 5) + 1] + "____" + map[(y * 3)][(x * 5) + 5:]
-                if 's' in self.walls[y][x]:
-                    map[(y * 3) + 3] = map[(y * 3) + 3][0:(x * 5) + 1] + "____" + map[(y * 3) + 3][(x * 5) + 5:]
-                if 'e' in self.walls[y][x]:
-                    map[(y * 3) + 1] = map[(y * 3) + 1][0:(x * 5) + 5] + "|" + map[(y * 3) + 1][(x * 5) + 5:]
-                    map[(y * 3) + 2] = map[(y * 3) + 2][0:(x * 5) + 5] + "|" + map[(y * 3) + 2][(x * 5) + 5:]
-                    #map[(y * 3) + 3] = map[(y * 3) + 3][0:(x * 5) + 4] + "|" + map[(y * 3) + 3][(x * 5) + 5:]
-                if 'w' in self.walls[y][x]:
-                    map[(y * 3) + 1] = map[(y * 3) + 1][0:(x * 5)] + "|" + map[(y * 3) + 1][(x * 5) + 1:]
-                    map[(y * 3) + 2] = map[(y * 3) + 2][0:(x * 5)] + "|" + map[(y * 3) + 2][(x * 5) + 1:]
-                    #map[(y * 3) + 3] = map[(y * 3) + 3][0:(x * 5)] + "|" + map[(y * 3) + 3][(x * 5) + 1:]
+                if self.mapped_cells[y][x]:
+                    if 'n' in self.walls[y][x]:
+                        map[(y * 3)] = map[(y * 3)][0:(x * 5) + 1] + "____" + map[(y * 3)][(x * 5) + 5:]
+                    if 's' in self.walls[y][x]:
+                        map[(y * 3) + 3] = map[(y * 3) + 3][0:(x * 5) + 1] + "____" + map[(y * 3) + 3][(x * 5) + 5:]
+                    if 'e' in self.walls[y][x]:
+                        map[(y * 3) + 1] = map[(y * 3) + 1][0:(x * 5) + 5] + "|" + map[(y * 3) + 1][(x * 5) + 6:]
+                        map[(y * 3) + 2] = map[(y * 3) + 2][0:(x * 5) + 5] + "|" + map[(y * 3) + 2][(x * 5) + 6:]
+                    if 'w' in self.walls[y][x]:
+                        map[(y * 3) + 1] = map[(y * 3) + 1][0:(x * 5)] + "|" + map[(y * 3) + 1][(x * 5) + 1:]
+                        map[(y * 3) + 2] = map[(y * 3) + 2][0:(x * 5)] + "|" + map[(y * 3) + 2][(x * 5) + 1:]
+                else:
+                    map[(y * 3) + 1] = map[(y * 3) + 1][0:(x * 5) + 1] + "????" + map[(y * 3) + 1][(x * 5) + 5:]
+                    map[(y * 3) + 2] = map[(y * 3) + 2][0:(x * 5) + 1] + "????" + map[(y * 3) + 2][(x * 5) + 5:]
 
         for line in map:
             print(line)
 
     def calibration(self):
+        input = 'c'
+        while input.lower() != 'q':
+            print("********************")
+            print("Calibration")
+            print("********************")
+            print("Q - Quit and return to main menu")
         return
 
     def localization(self):
@@ -195,25 +205,78 @@ class Mapper:
 class Mapping_Menu:
     def __init__(self, mapper, debug=False):
         self.mapper = mapper
-        if not debug:
-            self.user_input = None
-            Thread(target = self.map).start()
-            self.user_input = input()
+        self.display_menu()
+
+    def display_menu(self):
+        user_input = ''
+        while user_input.lower() != 'q':
+            print("********************")
+            print("Mapping")
+            print("********************")
+            print("M - Start mapping")
+            print("L - Load map")
+            print("S - Save map")
+            print("Q - quit and return to main menu")
+            user_input = input()
+            system('clear')
+
+            if user_input.lower() == 'm':
+                self.user_input = None
+                Thread(target=self.map).start()
+                self.user_input = input()
+            elif user_input.lower() == 'l':
+                self.load_map()
+            elif user_input.lower() == 's':
+                self.save_map()
+
+    def save_map(self):
+        print("Existing files are overwritten without warning")
+        user_input = input("Save file as: ")
+        file = open(user_input, "w")
+
+        file.write("walls")
+        for i in self.mapper.walls:
+            for j in i:
+                file.write(j)
+
+        file.write("\nmapped cells")
+        for i in self.mapper.mapped_cells:
+            for j in i:
+                file.write(j)
+
+        file.close()
+        system('clear')
+        return
+
+    def load_map(self):
+        user_input = input("Enter the file to load: ")
+        exists = path.isfile(user_input)
+        if exists:
+            file = open(user_input, "r")
+
+            file.close()
+            system('clear')
+        else:
+            print("File not found")
+        return
 
     def map(self):
         # add front, left, and right walls
         self.add_walls()
         self.mapper.rob.rotate('r')
         # add back wall
+        time.sleep(0.1)
         self.add_walls()
+        time.sleep(0.1)
 
         while self.user_input == None:
-            system('clear')
+            # system('clear')
             self.mapper.draw_map()
             search_x = 0
             search_y = 0
-            while (self.mapper.mapped_cells[search_y][search_x]) and (search_y < 4):
-                while (self.mapper.mapped_cells[search_y][search_x]) and (search_x < 4):
+            print("searching map")
+            while (search_y < 4) and (self.mapper.mapped_cells[search_y][search_x]):
+                while (search_x < 4) and (self.mapper.mapped_cells[search_y][search_x]):
                     search_x += 1
                 if (search_x < 4) and (search_y < 4) and (self.mapper.mapped_cells[search_y][search_x] == False):
                     break
@@ -221,26 +284,29 @@ class Mapping_Menu:
                     search_y += 1
                     search_x = 0
             if (search_y >= 4) or (search_x >= 4):
-                system('clear')
+                # system('clear')
                 self.mapper.draw_map()
                 print("All cells mapped. Press any key to continue.")
                 return
             self.mapper.end_x = search_x
             self.mapper.end_y = search_y
+            print("Planning path")
             path = self.mapper.movement_planner()
 
             for direction in path:
                 if self.user_input != None:
-                    system('clear')
+                    # system('clear')
                     self.mapper.draw_map()
                     print("Press any key to continue.")
                     return
 
                 self.add_walls()
+                self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
                 self.mapper.rob.change_orientation(direction)
 
                 # A wall is blocking the path
                 if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
+                    print("wall in front")
                     break
                 # No wall, continue
                 else:
@@ -257,9 +323,10 @@ class Mapping_Menu:
                     else:
                         print("Improper value stored in rob.orientation. Should be 'n', 'e', 'w', or 's'")
 
+            print("adding walls")
             self.add_walls()
-            if (search_x == self.mapper.current_x) and (search_y == self.mapper.current_y):
-                self.mapper.mapped_cells[search_y][search_x] = True
+            print("stopped in cell")
+            self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
 
         if self.user_input != None:
             system('clear')
@@ -367,29 +434,49 @@ class Mapping_Menu:
 
         if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance) and (
                 front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-            print("front wall found")
+            # print("front wall found")
             self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
-        if (self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.cell_size) and (
+        if (self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 2)) and (
                 left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-            print("left wall found")
+            # print("left wall found")
             self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
-        if (self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.cell_size) and (
+            self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
+        if (self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 2)) and (
                 right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-            print("right wall found")
+            # print("right wall found")
             self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
-        print("******")
+
+        self.find_conflicts(self.mapper.current_x, self.mapper.current_y)
+        # print("******")
 
 class Localization_Menu:
     def __init__(self, mapper):
         self.mapper = mapper
         self.user_input = None
         Thread(target = self.print_menu).start()
-        self.user_input = input()
+        self.user_input = 'c'
+        while self.user_input.lower() != 'q':
+            self.user_input = input()
         system('clear')
 
     def print_menu(self):
-        while self.user_input == None:
+        while self.user_input.lower() != 'q':
             system('clear')
+
+            if self.user_input.lower() == 'd':
+                self.set_orientation()
+            elif self.user_input.lower() == 'c':
+                self.set_cell_number()
+            elif self.user_input.lower() == 'r':
+                self.reset_map()
+
+            print("********************")
+            print("Localization")
+            print("********************")
+            print("D - Specify robot's current orientation")
+            print("C - Specify the robot's current cell number")
+            print("R - Reset map")
+            print("Q - Quit and return to main menu")
             print("********************")
             print("location = " + str(self.mapper.xy_to_cell(self.mapper.current_x, self.mapper.current_y) + 1)
                     +"     orientation = " + self.mapper.rob.orientation.upper())
@@ -403,8 +490,40 @@ class Localization_Menu:
                 print()
 
             print("********************")
-            print("Press any key to return")
             time.sleep(1)
+
+    def set_orientation(self):
+        system('clear')
+        user_input = input("Enter new orientation (n, s, e, w): ")
+        if (user_input.lower() == 'n') or (user_input.lower() == 's') \
+                or (user_input.lower() == 'e') or (user_input.lower() == 'w'):
+            self.mapper.rob.orientation = user_input
+        else:
+            print("Improper orientation")
+
+    def set_cell_number(self):
+        system('clear')
+        user_input = input("Enter cell number (1-16): ")
+        if (user_input.isdigit()) and (user_input > 0) and (user_input <= 16):
+            user_input -= 1
+            y = int(int(user_input) / 4)
+            x = int(user_input) % 4
+            self.mapper.current_x = x
+            self.mapper.current_y = y
+        else:
+            print("Improper cell number: ")
+
+    def reset_map(self):
+        user_input = input("Resetting map. Are you sure? (y/n): ")
+        if user_input.lower() == 'y':
+            self.mapper.walls = [[[], [], [], []],
+                                 [[], [], [], []],
+                                 [[], [], [], []],
+                                 [[], [], [], []]]
+            self.mapper.mapped_cells = [[False, False, False, False],
+                                 [False, False, False, False],
+                                 [False, False, False, False],
+                                 [False, False, False, False]]
 
 
 if __name__ == "__main__":
@@ -412,50 +531,3 @@ if __name__ == "__main__":
     rob = Robot()
     mapper = Mapper(rob)
     mapper.main_menu()
-
-# root = Tk()
-# myframe = Frame(root)
-# myframe.pack(fill=BOTH, expand=YES)
-# w = WaveFront(myframe,highlightthickness=0)
-# walls = [["n", "s", "w"],
-#          ["n", "s"],
-#          ["n"],
-#          ["n", "e"],
-#          ["n", "w"],
-#          ["n", "e"],
-#          ["e", 'w'],
-#          ['e', 'w'],
-#          ['e', 'w'],
-#          ['w', 's'],
-#          ['e', 's'],
-#          ['e', 'w'],
-#          ['w', 's'],
-#          ['n', 's'],
-#          ['n', 's'],
-#          ['s', 'e']]
-# draw_map(walls)
-#
-# path = w.movement_planner(0, 8, walls)
-# cell_x = 5
-# cell_y = 5
-# while len(path) > 0:
-#     if path[0] == 'n':
-#         w.create_line(cell_x, cell_y, cell_x, cell_y - 10)
-#         cell_y -= 10
-#     elif path[0] == 'e':
-#         w.create_line(cell_x, cell_y, cell_x + 10, cell_y)
-#         cell_x += 10
-#     elif path[0] == 's':
-#         w.create_line(cell_x, cell_y, cell_x, cell_y + 10)
-#         cell_y += 10
-#     elif path[0] == 'w':
-#         w.create_line(cell_x, cell_y, cell_x - 10, cell_y)
-#         cell_x -= 10
-#     path.pop(0)
-#
-# # w.pack(fill=BOTH, expand=YES)
-#
-# # w = Canvas(master, highlightthickness=0)
-# w.pack(fill=BOTH, expand=YES)
-#
-# mainloop()

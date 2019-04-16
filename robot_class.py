@@ -123,7 +123,7 @@ class Robot():
 
     def rotate(self, direction='r'):
         rotations = (self.encoder.WSEPARATION * math.pi / 4) / (self.encoder.WDIAMETER * math.pi)
-        ticks = int(rotations * 32 * 1.2)
+        ticks = int(rotations * 32 * 1.1)
         self.encoder.step_count = (0, 0)
         self.encoder.steps_to_move = [ticks, ticks]
         speed = min(self.encoder.get_max_forward_speed(), -self.encoder.get_max_backward_speed())
@@ -214,7 +214,7 @@ class Robot():
 
     def forward(self):
         rotations = (self.cell_size / 2) / (self.encoder.WDIAMETER * math.pi)
-        ticks = int(rotations * 32)
+        ticks = int(rotations * 32 * 1.05)
         self.encoder.step_count = (0, 0)
         self.encoder.steps_to_move = [ticks, ticks]
         next_cell = NextCell(self, (self.distance_sensor.get_left_inches() < self.cell_size),
@@ -231,28 +231,28 @@ class Robot():
         # else:
 
         if True:
-            input("Enter to WF")
-            self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
-            follow_both(self, next_cell)
+            #input("Enter to WF")
+            # self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
+            # follow_both(self, next_cell.move_to_cell)
             # while next_cell.move_to_cell():
             #     print("moving to cell")
             #     time.sleep(0.1)
 
+            follow_both(self, next_cell, next_cell.move_to_cell)
             self.encoder.step_count = (0, 0)
             self.encoder.steps_to_move = [ticks, ticks]
-            time.sleep(0.1)
-            follow_both(self, next_cell)
+            follow_both(self, next_cell, next_cell.center_in_cell)
 ##            self.encoder.setSpeedsIPS(self.encoder.get_max_forward_speed(), self.encoder.get_max_forward_speed())
-            input("Enter to Center")
-            while next_cell.center_in_cell():
-                print("Centering in cell")
-                distance = self.distance_sensor.get_front_inches()
-                proportional_control = saturation_function(1.5 * ((self.cell_size / 2 ) - distance),
-                                                        self.encoder.get_max_forward_speed(),
-                                                        self.encoder.get_max_backward_speed())
-                self.encoder.setSpeedsIPS(proportional_control, proportional_control)
-                time.sleep(0.01)
-##                
+            #input("Enter to Center")
+#             while next_cell.center_in_cell():
+#                 #print("Centering in cell")
+#                 distance = self.distance_sensor.get_front_inches()
+#                 proportional_control = saturation_function(1.5 * ((self.cell_size / 2 ) - distance),
+#                                                         self.encoder.get_max_forward_speed(),
+#                                                         self.encoder.get_max_backward_speed())
+#                 self.encoder.setSpeedsIPS(proportional_control, proportional_control)
+#                 time.sleep(0.01)
+# ##
 ##                time.sleep(0.1)
             self.encoder.stop()
 
@@ -306,6 +306,30 @@ class NextCell:
             return False
         if self.rob.encoder.steps_to_move[0] == -1:
             return False
+
+        # reset encoder steps if the wall state changes: robot was not at the edge of the cell, but is now
+        if self.left_wall_detected:
+            if self.rob.distance_sensor.get_left_inches() > self.rob.cell_size:
+                # print("left wall not found")
+                self.rob.encoder.step_count = (0, 0)
+                self.left_wall_detected = False
+        else:
+            if self.rob.distance_sensor.get_left_inches() < self.rob.cell_size:
+                # print("new left wall found")
+                self.rob.encoder.step_count = (0, 0)
+                self.left_wall_detected = True
+
+        if self.right_wall_detected:
+            if self.rob.distance_sensor.get_right_inches() > self.rob.cell_size:
+                # print("right wall not found")
+                self.rob.encoder.step_count = (0, 0)
+                self.right_wall_detected = False
+        else:
+             if self.rob.distance_sensor.get_right_inches() < self.rob.cell_size:
+                 # print("new right wall found")
+                 self.rob.encoder.step_count = (0, 0)
+                 self.right_wall_detected = True
+
         return True
 
 

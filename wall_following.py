@@ -1,14 +1,14 @@
 #from robot_class import Robot
 import time as time
 
-def follow_right(state_machine, rob):
+def follow_right(state_machine, rob, wall_dist=7.64):
 ##    print("following right")
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
-    desired_distance = 9
+    desired_distance = wall_dist
     # Proportional gain
-    Kp = .5
+    Kp = 0.2
 
 ##    user_input = input("Place robot beside wall and press enter to continue.")
 
@@ -35,9 +35,10 @@ def follow_right(state_machine, rob):
     if (f_distance < 0):
 ##    if f_distance < (desired_distance * 2):
         #front wall is deteced withing distance*2 inches. Starts to turn
-        print("Turning")
-        rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control,
-                                    max_forward), max_forward)
+        # print("Turning")
+        # rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, f_proportional_control,
+        #                             max_forward), max_forward)
+        return min(max_forward + r_proportional_control, f_proportional_control, max_forward), max_forward
     else:
         if (state_machine and (r_distance > (desired_distance * 20))):
             print("going straight")
@@ -50,20 +51,21 @@ def follow_right(state_machine, rob):
 ##                                                                                        rob.distance_sensor.get_left_inches(),
 ##                                                                                        min(max_forward + r_proportional_control, max_forward)))
 ##            print("Wall following")
-            rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
-                                    min(max_forward - r_proportional_control, max_forward))
-    time.sleep(0.01)
+            # rob.encoder.setSpeedsIPS(min(max_forward + r_proportional_control, max_forward),
+            #                         min(max_forward - r_proportional_control, max_forward))
+            return min(max_forward + r_proportional_control, max_forward), min(max_forward - r_proportional_control, max_forward)
+    # time.sleep(0.01)
 
 
-def follow_left(state_machine, rob):
+def follow_left(state_machine, rob, wall_dist=7.64):
     #rob = Robot()
 ##    print("following left")
     max_forward = rob.encoder.get_max_forward_speed()
     max_backward = rob.encoder.get_max_backward_speed()
 
-    desired_distance = 9
+    desired_distance = wall_dist
     # Proportional gain
-    Kp = .5
+    Kp = .2
 
     #user_input = input("Place robot beside wall and press enter to continue.")
 
@@ -86,9 +88,10 @@ def follow_left(state_machine, rob):
 ##                                                                                    min(max_forward - l_proportional_control, max_forward),
 ##                                                                                    rob.distance_sensor.get_right_inches(),
 ##                                                                                    min(max_forward + l_proportional_control, max_forward)))
-        rob.encoder.setSpeedsIPS(min(max_forward - l_proportional_control, max_forward),
-                                min(max_forward + l_proportional_control, max_forward))
-    time.sleep(0.01)
+        # rob.encoder.setSpeedsIPS(min(max_forward - l_proportional_control, max_forward),
+        #                         min(max_forward + l_proportional_control, max_forward))
+        return min(max_forward - l_proportional_control, max_forward), min(max_forward + l_proportional_control, max_forward)
+    # time.sleep(0.01)
 
 def saturation_function(proportional_speed, max_forward_speed, max_backward_speed):
     if proportional_speed > 0.1:
@@ -104,17 +107,32 @@ def saturation_function(proportional_speed, max_forward_speed, max_backward_spee
     else:
         return 0
 
-def follow_both(rob=None, next_cell=None):
-    if rob is None or next_cell is None:
+def follow_both(rob=None, next_cell = None, stopping_function=None):
+    if rob is None or stopping_function is None:
         print("Error:Robot object was not passed")
         exit()
-    while(next_cell.move_to_cell()):
-        print("moving to cell")
-        if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
-            follow_right(False,rob)
+    while(stopping_function()):
+        # print("moving to cell")
+        lwall_dist = rob.distance_sensor.get_left_inches()
+        rwall_dist = rob.distance_sensor.get_right_inches()
+
+        if (lwall_dist < rob.cell_size) and (rwall_dist < rob.cell_size):
+            lwall_lspeed, lwall_rspeed = follow_left(False, rob, (lwall_dist + rwall_dist) / 2)
+            rwall_lspeed, rwall_rspeed = follow_right(False, rob, (lwall_dist + rwall_dist) / 2)
+            rob.encoder.setSpeedsIPS((lwall_lspeed + rwall_lspeed) / 2, (lwall_rspeed + rwall_rspeed) / 2)
+        elif lwall_dist < rob.cell_size:
+            lwall_lspeed, lwall_rspeed = follow_left(False, rob)
+            rob.encoder.setSpeedsIPS(lwall_lspeed, lwall_rspeed)
+        elif rwall_dist < rob.cell_size:
+            rwall_lspeed, rwall_rspeed = follow_right(False, rob)
+            rob.encoder.setSpeedsIPS(rwall_lspeed, rwall_rspeed)
         else:
-            follow_left(False,rob)
-##        time.sleep(0.1)
+            rob.encoder.setSpeedsIPS(rob.encoder.get_max_forward_speed(), rob.encoder.get_max_forward_speed())
+        # if rob.distance_sensor.get_right_inches() < rob.distance_sensor.get_left_inches():
+        #     follow_right(False,rob)
+        # else:
+        #     follow_left(False,rob)
+        time.sleep(0.01)
 
 def main():
     from robot_class import Robot
