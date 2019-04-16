@@ -46,30 +46,31 @@ class Mapper:
             #     return distances
 
             # check up
-            if (cell_y > 0) and ("n" not in self.walls[cell_y][cell_x]):
+            if (cell_y > 0) and ("n" not in self.walls[cell_y][cell_x]) and ('s' not in self.walls[cell_y - 1][cell_x]):
                 if distances[cell_y - 1][cell_x] == -1:
                     wave_queue.append([cell_x, cell_y - 1])
                     distances[cell_y - 1][cell_x] = distances[cell_y][cell_x] + 1
 
             # check right
-            if (cell_x < 3) and ("e" not in self.walls[cell_y][cell_x]):
+            if (cell_x < 3) and ("e" not in self.walls[cell_y][cell_x]) and ('w' not in self.walls[cell_y][cell_x + 1]):
                 if distances[cell_y][cell_x + 1] == -1:
                     wave_queue.append([cell_x + 1, cell_y])
                     distances[cell_y][cell_x + 1] = distances[cell_y][cell_x] + 1
 
             # check down
-            if (cell_y < 3) and ("s" not in self.walls[cell_y][cell_x]):
+            if (cell_y < 3) and ("s" not in self.walls[cell_y][cell_x]) and ('n' not in self.walls[cell_y + 1][cell_x]):
                 if distances[cell_y + 1][cell_x] == -1:
                     wave_queue.append([cell_x, cell_y + 1])
                     distances[cell_y + 1][cell_x] = distances[cell_y][cell_x] + 1
 
             # check left
-            if (cell_x > 0) and ("w" not in self.walls[cell_y][cell_x]):
+            if (cell_x > 0) and ("w" not in self.walls[cell_y][cell_x]) and ('e' not in self.walls[cell_y][cell_x - 1]):
                 if distances[cell_y][cell_x - 1] == -1:
                     wave_queue.append([cell_x - 1, cell_y])
                     distances[cell_y][cell_x - 1] = distances[cell_y][cell_x] + 1
 
         print(distances)
+        print(self.current_x, self.current_y)
         return distances
 
     def movement_planner(self):

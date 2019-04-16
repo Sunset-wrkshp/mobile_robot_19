@@ -123,7 +123,7 @@ class Robot():
 
     def rotate(self, direction='r'):
         rotations = (self.encoder.WSEPARATION * math.pi / 4) / (self.encoder.WDIAMETER * math.pi)
-        ticks = int(rotations * 32 * 1.1)
+        ticks = int(rotations * 32 * 1.2)
         self.encoder.step_count = (0, 0)
         self.encoder.steps_to_move = [ticks, ticks]
         speed = min(self.encoder.get_max_forward_speed(), -self.encoder.get_max_backward_speed())
