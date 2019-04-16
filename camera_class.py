@@ -102,3 +102,9 @@ class Camera():
     def ctrlC(self):
         print("Stopping camera")
         self.stop()
+
+
+if __name__ == "__main__":
+    cam = Camera()
+    time.sleep(5)
+    cam.stop()
