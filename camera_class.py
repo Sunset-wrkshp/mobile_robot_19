@@ -28,7 +28,7 @@ class Camera():
     # Default HSV ranges
     # Note: the range for hue is 0-180, not 0-255
 
-    
+
     # green
     color_0 = {'minH': 46, 'minS': 86, 'minV': 53,
                'maxH': 92, 'maxS': 210, 'maxV': 255}
@@ -119,6 +119,28 @@ class Camera():
         print("Stopping camera")
         self.stop()
 
+    def color_get():
+        # ["green","orange", "pink", "blue"]
+        color_list= [None,None,None,None]
+        for x in range(0,3):
+            t_list = []
+            for y in range(0,10):
+                blobs = self.get_blobs(x)
+                if len(blobs) > 0:
+                    t_list.append(True)
+                    # print("found {}".format(color[x]))
+                else:
+                    t_list.append(False)
+            if any(t_list):
+                color[x] = True
+            else:
+                color[x] = False
+        print(color_list)
+        for val in color_list:
+            if val = True:
+                return color_list.index(val)
+        return None
+
 
 if __name__ == "__main__":
     cam = Camera()
@@ -130,6 +152,6 @@ if __name__ == "__main__":
                 print("found {}".format(color[x]))
             else:
                 print("No color found")
-   
-        
+
+
     cam.stop()
