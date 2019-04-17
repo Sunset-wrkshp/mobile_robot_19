@@ -27,13 +27,21 @@ class Camera():
 
     # Default HSV ranges
     # Note: the range for hue is 0-180, not 0-255
-    # minH maxH minS maxS minV maxV
-    color_0 = {'minH': 160, 'minS': 120, 'minV': 0,
-               'maxH': 180, 'maxS': 210, 'maxV': 255}
-    color_1 = {'minH': 160, 'minS': 120, 'minV': 0,
-               'maxH': 180, 'maxS': 210, 'maxV': 255}
-    # minH = 160; minS = 120; minV =   0;
-    # maxH = 180; maxS = 210; maxV = 255;
+
+    
+    # green
+    color_0 = {'minH': 46, 'minS': 86, 'minV': 53,
+               'maxH': 92, 'maxS': 210, 'maxV': 255}
+    # orange
+    color_1 = {'minH': 11, 'minS': 120, 'minV': 0,
+               'maxH': 35, 'maxS': 210, 'maxV': 255}
+    #pink
+    color_2 = {'minH': 162, 'minS': 103, 'minV': 173,
+               'maxH': 180, 'maxS': 165, 'maxV': 255}
+    #blue
+    color_3 = {'minH': 95, 'minS': 105, 'minV': 75,
+               'maxH': 118, 'maxS': 210, 'maxV': 255}
+
 
     def __init__(self):
         # Initialize the threaded camera
@@ -68,9 +76,17 @@ class Camera():
         color = {}
 
         if (id == 0):
+            #green
             color = self.color_0
         elif (id == 1):
+            #orange
             color = self.color_1
+        elif (id == 2):
+            #pink
+            color = self.color_2
+        elif (id ==3):
+            #blue
+            color = self.color_3
 
 
         # Get a frame
@@ -81,7 +97,7 @@ class Camera():
         frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         # Create a mask using the given HSV range
-        mask = cv.inRange(frame_hsv, (self.color[minH], self.color[minS], self.color[minV]), (self.color[maxH], self.color[maxS], self.color[maxV]))
+        mask = cv.inRange(frame_hsv, (color['minH'], color['minS'], color['minV']), (color['maxH'], color['maxS'], color['maxV']))
 
         # Run the SimpleBlobDetector on the mask.
         # The results are stored in a vector of 'KeyPoint' objects,
@@ -106,5 +122,14 @@ class Camera():
 
 if __name__ == "__main__":
     cam = Camera()
-    time.sleep(5)
+    while(True):
+        for x in range(0,3):
+            blobs = cam.get_blobs(x)
+            color = ["green","orange", "pink", "blue"]
+            if len(blobs) > 0:
+                print("found {}".format(color[x]))
+            else:
+                print("No color found")
+   
+        
     cam.stop()
