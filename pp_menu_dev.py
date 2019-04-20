@@ -92,6 +92,7 @@ class Path_Planning_Menu:
         #check if a map exists
         # if (map_exists):
         #     run
+        pass
 
 def main():
     p = Path_Planning_Menu():
