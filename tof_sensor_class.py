@@ -1,5 +1,7 @@
 import time
 import sys
+from threading import Thread
+import statistics
 sys.path.append('/home/pi/VL53L0X_rasp_python/python')
 import VL53L0X
 import RPi.GPIO as GPIO

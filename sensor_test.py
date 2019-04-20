@@ -4,11 +4,12 @@ import statistics
 
 rob = Robot()
 while True:
-    print("front" + str(rob.distance_sensor.get_front_inches()))
-    print("left" + str(rob.distance_sensor.get_left_inches()))
-    print("right" + str(rob.distance_sensor.get_right_inches()))
-    print()
-    time.sleep(0.1)
+    print("front " + str(rob.distance_sensor.get_front_inches()))
+    print("left " + str(rob.distance_sensor.get_left_inches()))
+    print("right " + str(rob.distance_sensor.get_right_inches()))
+    print("Average side: " + str((rob.distance_sensor.get_right_inches() + rob.distance_sensor.get_left_inches()) / 2))
+    # print(rob.distance_sensor.get_average(0.2))
+    time.sleep(1)
 
 # def trim(percent, arr):
 #     num_to_trim = int(len(arr) * percent)

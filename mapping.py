@@ -1,10 +1,8 @@
-from tkinter import *
-import math
 from threading import Thread
 from os import system, path
-import time
 from robot_class import *
-
+import time
+from navigation import navigate
 
 class Mapper:
     def __init__(self, rob, start_x = 0, start_y = 0, end_x = 0, end_y = 0):
@@ -69,8 +67,8 @@ class Mapper:
                     wave_queue.append([cell_x - 1, cell_y])
                     distances[cell_y][cell_x - 1] = distances[cell_y][cell_x] + 1
 
-        print(distances)
-        print(self.current_x, self.current_y)
+        #print(distances)
+        #print(self.current_x, self.current_y)
         return distances
 
     def movement_planner(self):
@@ -154,12 +152,85 @@ class Mapper:
             print(line)
 
     def calibration(self):
-        input = 'c'
-        while input.lower() != 'q':
+        user_input = 'c'
+        while user_input.lower() != 'q':
             print("********************")
             print("Calibration")
             print("********************")
+            print("C - Recalibrate servos")
+            print("Wk - Change wall following Kp value")
+            print("Rk - Change rotation Kp value")
+            print("Fk - Change front wall adjustment Kp value")
+            print("Dt - Change distance threshold")
+            print("Dc - Change wall distance percentage change")
+            print("Wd - Change target wall distance")
+            print("R - Change rotation multiplier")
+            print("M - Change movement multiplier")
+            print("T - Test rotation")
+            print("F - Test forward movement")
             print("Q - Quit and return to main menu")
+            user_input = input()
+            system('clear')
+
+            if user_input.lower() == 'wk':
+                print("Current wall following Kp value: " + str(self.rob.wall_following_Kp))
+                new_kp = input("Enter new Kp: ")
+                self.rob.wall_following_Kp = float(new_kp)
+                system('clear')
+            elif user_input.lower() == 'wd':
+                print("Current target wall distance: " + str(self.rob.dist_from_front_wall))
+                new_dist = input("Enter new target wall distance: ")
+                self.rob.dist_from_front_wall = float(new_dist)
+                system('clear')
+            elif user_input.lower() == 'dc':
+                print("Current distance chagne percentage: " + str(self.rob.wall_distance_change))
+                new_dist_change = input("Enter new distance change percentage: ")
+                self.rob.wall_distance_change = float(new_dist_change)
+                system('clear')
+            elif user_input.lower() == 'rk':
+                print("Current rotation Kp value: " + str(self.rob.rotation_Kp))
+                new_rot_kp = input("Enter new rotation Kp: ")
+                self.rob.rotation_Kp = float(new_rot_kp)
+                system('clear')
+            elif user_input.lower() == 'fk':
+                print("Current front Kp value: " + str(self.rob.front_adjustment_Kp))
+                new_front_kp = input("Enter new front Kp: ")
+                self.rob.front_adjustment_Kp = float(new_front_kp)
+                system('clear')
+            elif user_input.lower() == 'dt':
+                print("Current distance threshold: " + str(self.rob.dist_threshold))
+                new_dist_thresh = input("Enter new distance threshold: ")
+                self.rob.dist_threshold = float(new_dist_thresh)
+                system('clear')
+            elif user_input.lower() == 'r':
+                print("Current rotation multiplier: " + str(self.rob.rotation_mult))
+                new_rot_mult = input("Enter new rotation multiplier: ")
+                self.rob.rotation_mult = float(new_rot_mult)
+                system('clear')
+            elif user_input.lower() == 'm':
+                print("Current forward movement multiplier: " + str(self.rob.forward_mult))
+                new_forward_mult = input("Enter new movement multiplier: ")
+                self.rob.forward_mult = float(new_forward_mult)
+                system('clear')
+            elif user_input.lower() == 't':
+                test_key = 'c'
+                while test_key.lower() != 'q':
+                    test_key = input("Press any key to rotate or enter 'q' to return")
+                    if test_key.lower() != 'q':
+                       self.rob.rotate()
+                    system('clear')
+            elif user_input.lower() == 'f':
+                test_key = 'c'
+                while test_key.lower() != 'q':
+                    test_key = input("Press any key move forward or enter 'q' to return")
+                    if test_key.lower() != 'q':
+                        self.rob.forward()
+                    system('clear')
+            elif user_input.lower() == 'c':
+                self.rob.encoder.TESTING = False
+                self.rob.encoder.calibrateSpeeds()
+                system('clear')
+
         return
 
     def localization(self):
@@ -174,7 +245,9 @@ class Mapper:
     def follow_path(self, path):
         for direction in path:
             self.rob.change_orientation(direction)
-            self.rob.forward()
+            stopped_early = self.rob.forward()
+            if stopped_early:
+                return
 
     def main_menu(self):
         user_input = 'C'
@@ -188,7 +261,7 @@ class Mapper:
             print("L - Localization")
             print("M - Mapping")
             print("P - Path Planning")
-            print("Q - quit\n")
+            print("Q - quit")
             user_input = input()
             system('clear')
 
@@ -206,6 +279,7 @@ class Mapper:
 class Mapping_Menu:
     def __init__(self, mapper, debug=False):
         self.mapper = mapper
+        self.wall_samples = 10
         self.display_menu()
 
     def display_menu(self):
@@ -218,6 +292,7 @@ class Mapping_Menu:
             print("L - Load map")
             print("S - Save map")
             print("Q - quit and return to main menu")
+            print("P - Print current map")
             user_input = input()
             system('clear')
 
@@ -229,21 +304,30 @@ class Mapping_Menu:
                 self.load_map()
             elif user_input.lower() == 's':
                 self.save_map()
+            elif user_input.lower() == 'p':
+                self.mapper.draw_map()
+
 
     def save_map(self):
         print("Existing files are overwritten without warning")
         user_input = input("Save file as: ")
         file = open(user_input, "w")
 
-        file.write("walls")
+        file.write("walls\n")
         for i in self.mapper.walls:
             for j in i:
-                file.write(j)
+                for k in j:
+                    file.write(k)
+                file.write("\n")
 
-        file.write("\nmapped cells")
+        file.write("mapped cells\n")
         for i in self.mapper.mapped_cells:
             for j in i:
-                file.write(j)
+                if j:
+                    file.write("T")
+                else:
+                    file.write("F")
+                file.write('\n')
 
         file.close()
         system('clear')
@@ -254,8 +338,36 @@ class Mapping_Menu:
         exists = path.isfile(user_input)
         if exists:
             file = open(user_input, "r")
+            data = file.readline()
+            self.mapper.walls = [[[], [], [], []],
+                          [[], [], [], []],
+                          [[], [], [], []],
+                          [[], [], [], []]]
+            self.mapper.mapped_cells = [[False, False, False, False],
+                                 [False, False, False, False],
+                                 [False, False, False, False],
+                                 [False, False, False, False]]
+            for i in range(4):
+                for j in range(4):
+                    data = file.readline()
+                    for char in data:
+                        if (char == 'n') or (char == 'w') or (char == 's') or (char == 'e'):
+                            self.mapper.walls[i][j].append(char)
+                    print()
+            data = file.readline()
+            data = file.readline()
+            for i in range(4):
+                for j in range(4):
+                    data = file.readline()
+                    if data == "T":
+                        self.mapper.mapped_cells[i][j] = True
+                    elif data == "F":
+                        self.mapper.mapped_cells[i][j] = False
 
             file.close()
+            print(self.mapper.walls)
+            print(self.mapper.mapped_cells)
+            user_input = input()
             system('clear')
         else:
             print("File not found")
@@ -275,7 +387,7 @@ class Mapping_Menu:
             self.mapper.draw_map()
             search_x = 0
             search_y = 0
-            print("searching map")
+            #print("searching map")
             while (search_y < 4) and (self.mapper.mapped_cells[search_y][search_x]):
                 while (search_x < 4) and (self.mapper.mapped_cells[search_y][search_x]):
                     search_x += 1
@@ -285,18 +397,18 @@ class Mapping_Menu:
                     search_y += 1
                     search_x = 0
             if (search_y >= 4) or (search_x >= 4):
-                # system('clear')
+                #system('clear')
                 self.mapper.draw_map()
                 print("All cells mapped. Press any key to continue.")
                 return
             self.mapper.end_x = search_x
             self.mapper.end_y = search_y
-            print("Planning path")
+            #print("Planning path")
             path = self.mapper.movement_planner()
 
             for direction in path:
                 if self.user_input != None:
-                    # system('clear')
+                    #system('clear')
                     self.mapper.draw_map()
                     print("Press any key to continue.")
                     return
@@ -307,11 +419,14 @@ class Mapping_Menu:
 
                 # A wall is blocking the path
                 if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
-                    print("wall in front")
+                    self.mapper.rob.adjust_front_distance()
+                    #print("wall in front")
                     break
                 # No wall, continue
                 else:
-                    self.mapper.rob.forward()
+                    stopped_early = self.mapper.rob.forward()
+                    if stopped_early:
+                        break
                     orientation = self.mapper.rob.orientation.lower()
                     if orientation == 'n':
                         self.mapper.current_y -= 1
@@ -324,13 +439,14 @@ class Mapping_Menu:
                     else:
                         print("Improper value stored in rob.orientation. Should be 'n', 'e', 'w', or 's'")
 
-            print("adding walls")
+
+            #print("adding walls")
             self.add_walls()
-            print("stopped in cell")
+            #print("stopped in cell")
             self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
 
         if self.user_input != None:
-            system('clear')
+            #system('clear')
             self.mapper.draw_map()
             print("Press any key to continue.")
             return
@@ -433,20 +549,55 @@ class Mapping_Menu:
         left_dir = self.mapper.rob.get_left_dir()
         right_dir = self.mapper.rob.get_right_dir()
 
-        if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance) and (
-                front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
+        num_f = 0
+        num_t = 0
+        if front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+            for i in range(self.wall_samples):
+                if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
+                    num_t += 1
+                else:
+                    num_f += 1
+                time.sleep(0.01)
+            if num_t > num_f:
+                self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
+        # if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance) and (
+        #         front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
             # print("front wall found")
-            self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
-        if (self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 2)) and (
-                left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-            # print("left wall found")
-            self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
-            self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
-        if (self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 2)) and (
-                right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-            # print("right wall found")
-            self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
 
+        num_f = 0
+        num_t = 0
+        if left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+            for i in range(self.wall_samples):
+                if self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 1.5):
+                    num_t += 1
+                else:
+                    num_f += 1
+                time.sleep(0.01)
+            if num_t > num_f:
+                self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
+
+        num_f = 0
+        num_t = 0
+        if right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+            for i in range(self.wall_samples):
+                if self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 1.5):
+                    num_t += 1
+                else:
+                    num_f += 1
+                time.sleep(0.01)
+            if num_t > num_f:
+                self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
+
+        # if (self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 2)) and (
+        #         left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
+        #     # print("left wall found")
+        #     self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
+        # if (self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 2)) and (
+        #         right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
+        #     # print("right wall found")
+        #     self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
+        #print(self.mapper.walls)
+        #user_input = input()
         self.find_conflicts(self.mapper.current_x, self.mapper.current_y)
         # print("******")
 
@@ -454,10 +605,12 @@ class Localization_Menu:
     def __init__(self, mapper):
         self.mapper = mapper
         self.user_input = None
-        Thread(target = self.print_menu).start()
-        self.user_input = 'c'
-        while self.user_input.lower() != 'q':
-            self.user_input = input()
+        self.user_input = ''
+        self.print_menu()
+        # Thread(target = self.print_menu).start()
+        # self.user_input = 'c'
+        # while self.user_input.lower() != 'q':
+        #     self.user_input = input()
         system('clear')
 
     def print_menu(self):
@@ -481,17 +634,18 @@ class Localization_Menu:
             print("********************")
             print("location = " + str(self.mapper.xy_to_cell(self.mapper.current_x, self.mapper.current_y) + 1)
                     +"     orientation = " + self.mapper.rob.orientation.upper())
+            self.user_input = input()
 
-            for y in self.mapper.mapped_cells:
-                for x in self.mapper.mapped_cells[y]:
-                    if self.mapper.mapped_cells[y][x]:
-                        print('x', end='')
-                    else:
-                        print('.', end='')
-                print()
-
-            print("********************")
-            time.sleep(1)
+            # for y in self.mapper.mapped_cells:
+            #     for x in y:
+            #         if x:
+            #             print('x', end='')
+            #         else:
+            #             print('.', end='')
+            #     print()
+            #
+            # print("********************")
+            # time.sleep(1)
 
     def set_orientation(self):
         system('clear')
@@ -505,7 +659,8 @@ class Localization_Menu:
     def set_cell_number(self):
         system('clear')
         user_input = input("Enter cell number (1-16): ")
-        if (user_input.isdigit()) and (user_input > 0) and (user_input <= 16):
+        if (user_input.isdigit()) and (int(user_input) > 0) and (int(user_input) <= 16):
+            user_input = int(user_input)
             user_input -= 1
             y = int(int(user_input) / 4)
             x = int(user_input) % 4
@@ -525,6 +680,7 @@ class Localization_Menu:
                                  [False, False, False, False],
                                  [False, False, False, False],
                                  [False, False, False, False]]
+
 
 
 if __name__ == "__main__":
