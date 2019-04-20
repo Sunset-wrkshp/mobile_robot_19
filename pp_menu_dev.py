@@ -19,9 +19,9 @@ class Path_Planning_Menu:
             if self.user_input.lower() == 'd':
                 self.set_orientation()
             elif self.user_input.lower() == 'c':
-                self.set_cell_number()
+                self.choose_color()
             elif self.user_input.lower() == 'r':
-                self.reset_map()
+                self.run()
 
             print("********************")
             print("Path Planning")
@@ -95,7 +95,7 @@ class Path_Planning_Menu:
         pass
 
 def main():
-    p = Path_Planning_Menu():
+    p = Path_Planning_Menu(1)
 
 
 if __name__ == '__main__':
