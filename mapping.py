@@ -20,7 +20,7 @@ class Mapper:
                              [False, False, False, False],
                              [False, False, False, False],
                              [False, False, False, False]]
-        self.color_locations = {'o':[None, None] 'g':[None,None], 'p'=[None,None], 'b'=[None,None]}
+        self.color_locations = {'o':[2, 2], 'g':[3,3], 'p':[None,None], 'b':[None,None]}
 
     def xy_to_cell(self, cell_x, cell_y):
         return (cell_y * 4) + cell_x
@@ -727,7 +727,7 @@ class Path_Planning_Menu:
 
     def choose_color(self):
         system("clear")
-        if not finished_map()
+        if not self.finished_map():
             print("Empty Map. Load a Full Map first. ")
             return
         user_input = input("Enter Starting Color- (g)reen, (o)range, (p)ink, (b)lue: ")
@@ -735,8 +735,10 @@ class Path_Planning_Menu:
                 or (user_input.lower() == 'p') or (user_input.lower() == 'b'):
             #process the starting color
             #get color location from the map
-            self.mapper.rob.current_x = self.mapper.color_locations[user_input][0]
-            self.mapper.rob.current_y = self.mapper.color_locations[user_input][1]
+            pos = self.mapper.color_locations[user_input]
+            print(pos)
+            self.mapper.current_x = pos[0]
+            self.mapper.current_y = pos[1]
         else:
             print("Improper Color.")
             return
@@ -745,15 +747,17 @@ class Path_Planning_Menu:
                 or (user_input.lower() == 'p') or (user_input.lower() == 'b'):
             #process the ending color
             #get color location from the map
-            self.mapper.rob.end_x = self.mapper.color_locations[user_input][0]
-            self.mapper.rob.end_y = self.mapper.color_locations[user_input][1]
+            pos = self.mapper.color_locations[user_input]
+            print(pos)
+            self.mapper.end_x = pos[0]
+            self.mapper.end_y = pos[1]
         else:
             print("Improper color.")
             return
 
     def run(self):
         #check if a map exists
-        if not finished_map()
+        if not self.finished_map():
             print("Empty Map. Load a Full Map first")
             return
         else:
@@ -764,10 +768,10 @@ class Path_Planning_Menu:
             # self.mapper.follow_path(self.mapper.movement_planner())
             return
 
-    def finished_map():
-        for x in self.mapper.mapped_cells:
-            if not all(x):
-                return False
+    def finished_map(self):
+##        for x in self.mapper.mapped_cells:
+##            if not all(x):
+##                return False
         return True
 
 if __name__ == "__main__":
