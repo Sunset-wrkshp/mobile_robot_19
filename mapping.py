@@ -727,7 +727,7 @@ class Path_Planning_Menu:
 
     def choose_color(self):
         system("clear")
-        if not all(self.mapper.mapped_cells):
+        if not finished_map()
             print("Empty Map. Load a Full Map first. ")
             return
         user_input = input("Enter Starting Color- (g)reen, (o)range, (p)ink, (b)lue: ")
@@ -753,7 +753,7 @@ class Path_Planning_Menu:
 
     def run(self):
         #check if a map exists
-        if not all(self.mapper.mapped_cells):
+        if not finished_map()
             print("Empty Map. Load a Full Map first")
             return
         else:
@@ -763,6 +763,12 @@ class Path_Planning_Menu:
             print(self.mapper.end_y)
             # self.mapper.follow_path(self.mapper.movement_planner())
             return
+
+    def finished_map():
+        for x in self.mapper.mapped_cells:
+            if not all(x):
+                return False
+        return True
 
 if __name__ == "__main__":
     #t1 = threading.Thread(target=main_menu, args=())
