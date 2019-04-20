@@ -46,19 +46,6 @@ class Path_Planning_Menu:
         else:
             print("Improper orientation")
 
-
-    # def reset_map(self):
-    #     user_input = input("Resetting map. Are you sure? (y/n): ")
-    #     if user_input.lower() == 'y':
-    #         self.mapper.walls = [[[], [], [], []],
-    #                              [[], [], [], []],
-    #                              [[], [], [], []],
-    #                              [[], [], [], []]]
-    #         self.mapper.mapped_cells = [[False, False, False, False],
-    #                              [False, False, False, False],
-    #                              [False, False, False, False],
-    #                              [False, False, False, False]]
-
     def choose_color(self):
         system("clear")
         user_input = input("Enter Starting Color- (g)reen, (o)range, (p)ink, (b)lue: ")
@@ -92,7 +79,7 @@ class Path_Planning_Menu:
         #check if a map exists
         # if (map_exists):
         #     run
-        pass
+        self.mapper.follow_path(self.mapper.movement_planner())
 
 def main():
     p = Path_Planning_Menu(1)
