@@ -20,7 +20,7 @@ class Mapper:
                              [False, False, False, False],
                              [False, False, False, False],
                              [False, False, False, False]]
-        self.color_locations = {o=[,] g=[,], p=[,], b=[,]}
+        self.color_locations = {'o':[None, None] 'g':[None,None], 'p'=[None,None], 'b'=[None,None]}
 
     def xy_to_cell(self, cell_x, cell_y):
         return (cell_y * 4) + cell_x
