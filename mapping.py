@@ -312,12 +312,13 @@ class Mapping_Menu:
     def save_map(self):
         print("Existing files are overwritten without warning")
         user_input = input("Save file as: ")
+        user_input = user_input + ".txt"
         file = open(user_input, "w")
 
         file.write("walls\n")
         file.write(json.dumps(self.mapper.walls))
 
-        file.write("mapped cells\n")
+        file.write("\nmapped cells\n")
         file.write(json.dumps(self.mapper.mapped_cells))
         # for i in self.mapper.mapped_cells:
         #     for j in i:
@@ -333,11 +334,13 @@ class Mapping_Menu:
 
     def load_map(self):
         user_input = input("Enter the file to load: ")
+        user_input += ".txt"
         exists = path.isfile(user_input)
         if exists:
             file = open(user_input, "r")
             #skip first line
             data = file.readline()
+##            print(data)
             #clear the current data
             self.mapper.walls = [[[], [], [], []],
                           [[], [], [], []],
@@ -347,8 +350,9 @@ class Mapping_Menu:
                                  [False, False, False, False],
                                  [False, False, False, False],
                                  [False, False, False, False]]
-            # data = file.readline()
-            self.mapper.walls = json.loads(file.readline())
+            data = file.readline()
+##            print(data)
+            self.mapper.walls = json.loads(data)
             file.readline()
             self.mapper.mapped_cells = json.loads(file.readline())
         # if exists:
@@ -385,7 +389,7 @@ class Mapping_Menu:
             file.close()
             print(self.mapper.walls)
             print(self.mapper.mapped_cells)
-            user_input = input()
+            user_input = input("Press Enter to continue:")
             system('clear')
         else:
             print("File not found")
@@ -787,9 +791,9 @@ class Path_Planning_Menu:
             return
 
     def finished_map(self):
-       for x in self.mapper.mapped_cells:
-           if not all(x):
-               return False
+        for x in self.mapper.mapped_cells:
+            if not all(x):
+                return False
         return True
 
 if __name__ == "__main__":
