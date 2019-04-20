@@ -20,7 +20,7 @@ class Mapper:
                              [False, False, False, False],
                              [False, False, False, False],
                              [False, False, False, False]]
-        self.color_locations = [[], [], [], []]
+        # self.color_locations = {'orange': [], [], [], []}
 
     def xy_to_cell(self, cell_x, cell_y):
         return (cell_y * 4) + cell_x
@@ -225,7 +225,7 @@ class Mapper:
                     test_key = input("Press any key move forward or enter 'q' to return")
                     if test_key.lower() != 'q':
                         self.rob.forward()
-                    system('clear')
+                    #system('clear')
             elif user_input.lower() == 'c':
                 self.rob.encoder.TESTING = False
                 self.rob.encoder.calibrateSpeeds()
@@ -279,7 +279,7 @@ class Mapper:
 class Mapping_Menu:
     def __init__(self, mapper, debug=False):
         self.mapper = mapper
-        self.wall_samples = 10
+        self.wall_samples = 20
         self.display_menu()
 
     def display_menu(self):
@@ -418,7 +418,7 @@ class Mapping_Menu:
                 self.mapper.rob.change_orientation(direction)
 
                 # A wall is blocking the path
-                if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
+                if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.dist_from_front_wall:
                     self.mapper.rob.adjust_front_distance()
                     #print("wall in front")
                     break
@@ -557,7 +557,7 @@ class Mapping_Menu:
                     num_t += 1
                 else:
                     num_f += 1
-                time.sleep(0.01)
+                #time.sleep(0.01)
             if num_t > num_f:
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
         # if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance) and (
@@ -572,7 +572,7 @@ class Mapping_Menu:
                     num_t += 1
                 else:
                     num_f += 1
-                time.sleep(0.01)
+                #time.sleep(0.01)
             if num_t > num_f:
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
 
@@ -584,7 +584,7 @@ class Mapping_Menu:
                     num_t += 1
                 else:
                     num_f += 1
-                time.sleep(0.01)
+                #time.sleep(0.01)
             if num_t > num_f:
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
 
