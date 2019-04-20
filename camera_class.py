@@ -37,7 +37,7 @@ class Camera():
                'maxH': 35, 'maxS': 210, 'maxV': 255}
     #pink
     color_2 = {'minH': 162, 'minS': 103, 'minV': 173,
-               'maxH': 180, 'maxS': 165, 'maxV': 255}
+               'maxH': 180, 'maxS': 204, 'maxV': 255}
     #blue
     color_3 = {'minH': 95, 'minS': 105, 'minV': 75,
                'maxH': 118, 'maxS': 210, 'maxV': 255}
@@ -137,7 +137,7 @@ class Camera():
                 color[x] = False
         print(color_list)
         for val in color_list:
-            if val = True:
+            if val == True:
                 return color_list.index(val)
         return None
 
