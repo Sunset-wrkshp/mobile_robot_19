@@ -3,6 +3,7 @@ from os import system, path
 from robot_class import *
 import time
 from navigation import navigate
+import json
 
 class Mapper:
     def __init__(self, rob, start_x = 0, start_y = 0, end_x = 0, end_y = 0):
@@ -314,20 +315,17 @@ class Mapping_Menu:
         file = open(user_input, "w")
 
         file.write("walls\n")
-        for i in self.mapper.walls:
-            for j in i:
-                for k in j:
-                    file.write(k)
-                file.write("\n")
+        file.write(json.dumps(self.mapper.walls))
 
         file.write("mapped cells\n")
-        for i in self.mapper.mapped_cells:
-            for j in i:
-                if j:
-                    file.write("T")
-                else:
-                    file.write("F")
-                file.write('\n')
+        file.write(json.dumps(self.mapper.mapped_cells))
+        # for i in self.mapper.mapped_cells:
+        #     for j in i:
+        #         if j:
+        #             file.write("T")
+        #         else:
+        #             file.write("F")
+        #         file.write('\n')
 
         file.close()
         system('clear')
@@ -338,7 +336,9 @@ class Mapping_Menu:
         exists = path.isfile(user_input)
         if exists:
             file = open(user_input, "r")
+            #skip first line
             data = file.readline()
+            #clear the current data
             self.mapper.walls = [[[], [], [], []],
                           [[], [], [], []],
                           [[], [], [], []],
@@ -347,22 +347,40 @@ class Mapping_Menu:
                                  [False, False, False, False],
                                  [False, False, False, False],
                                  [False, False, False, False]]
-            for i in range(4):
-                for j in range(4):
-                    data = file.readline()
-                    for char in data:
-                        if (char == 'n') or (char == 'w') or (char == 's') or (char == 'e'):
-                            self.mapper.walls[i][j].append(char)
-                    print()
-            data = file.readline()
-            data = file.readline()
-            for i in range(4):
-                for j in range(4):
-                    data = file.readline()
-                    if data == "T":
-                        self.mapper.mapped_cells[i][j] = True
-                    elif data == "F":
-                        self.mapper.mapped_cells[i][j] = False
+            # data = file.readline()
+            self.mapper.walls = json.loads(file.readline())
+            file.readline()
+            self.mapper.mapped_cells = json.loads(file.readline())
+        # if exists:
+        #     file = open(user_input, "r")
+        #     #skip first line
+        #     data = file.readline()
+        #     #clear the current data
+        #     self.mapper.walls = [[[], [], [], []],
+        #                   [[], [], [], []],
+        #                   [[], [], [], []],
+        #                   [[], [], [], []]]
+        #     self.mapper.mapped_cells = [[False, False, False, False],
+        #                          [False, False, False, False],
+        #                          [False, False, False, False],
+        #                          [False, False, False, False]]
+        #
+        #     for i in range(4):
+        #         for j in range(4):
+        #             data = file.readline()
+        #             for char in data:
+        #                 if (char == 'n') or (char == 'w') or (char == 's') or (char == 'e'):
+        #                     self.mapper.walls[i][j].append(char)
+        #             print()
+        #     data = file.readline()
+        #     data = file.readline()
+        #     for i in range(4):
+        #         for j in range(4):
+        #             data = file.readline()
+        #             if data == "T":
+        #                 self.mapper.mapped_cells[i][j] = True
+        #             elif data == "F":
+        #                 self.mapper.mapped_cells[i][j] = False
 
             file.close()
             print(self.mapper.walls)
