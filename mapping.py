@@ -727,19 +727,16 @@ class Path_Planning_Menu:
 
     def choose_color(self):
         system("clear")
+        if not all(self.mapper.mapped_cells):
+            print("Empty Map. Load a Full Map first. ")
+            return
         user_input = input("Enter Starting Color- (g)reen, (o)range, (p)ink, (b)lue: ")
         if (user_input.lower() == 'g') or (user_input.lower() == 'o') \
                 or (user_input.lower() == 'p') or (user_input.lower() == 'b'):
             #process the starting color
             #get color location from the map
-            #set robot starting location to that cell number/ (x,y)
-            # user_input = int(user_input)
-            # user_input -= 1
-            # y = int(int(user_input) / 4)
-            # x = int(user_input) % 4
-            # self.mapper.current_x = x
-            # self.mapper.current_y = y
-            pass
+            self.mapper.rob.current_x = self.mapper.color_locations[user_input][0]
+            self.mapper.rob.current_y = self.mapper.color_locations[user_input][1]
         else:
             print("Improper Color.")
             return
@@ -748,18 +745,24 @@ class Path_Planning_Menu:
                 or (user_input.lower() == 'p') or (user_input.lower() == 'b'):
             #process the ending color
             #get color location from the map
-            #set robot ending location to that cell number/ (x,y)
-            pass
+            self.mapper.rob.end_x = self.mapper.color_locations[user_input][0]
+            self.mapper.rob.end_y = self.mapper.color_locations[user_input][1]
         else:
             print("Improper color.")
             return
 
     def run(self):
         #check if a map exists
-        # if (map_exists):
-        #     run
-        self.mapper.follow_path(self.mapper.movement_planner())
-        return
+        if not all(self.mapper.mapped_cells):
+            print("Empty Map. Load a Full Map first")
+            return
+        else:
+            print(self.mapper.current_x)
+            print(self.mapper.current_y)
+            print(self.mapper.end_x)
+            print(self.mapper.end_y)
+            # self.mapper.follow_path(self.mapper.movement_planner())
+            return
 
 if __name__ == "__main__":
     #t1 = threading.Thread(target=main_menu, args=())
