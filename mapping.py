@@ -20,7 +20,7 @@ class Mapper:
                              [False, False, False, False],
                              [False, False, False, False],
                              [False, False, False, False]]
-        self.color_locations = {'o':[2, 2], 'g':[3,3], 'p':[None,None], 'b':[None,None]}
+        self.color_locations = {'o':[None, None], 'g':[None,None], 'p':[None,None], 'b':[None,None]}
 
     def xy_to_cell(self, cell_x, cell_y):
         return (cell_y * 4) + cell_x
@@ -736,7 +736,7 @@ class Path_Planning_Menu:
             #process the starting color
             #get color location from the map
             pos = self.mapper.color_locations[user_input]
-            print(pos)
+            # print(pos)
             self.mapper.current_x = pos[0]
             self.mapper.current_y = pos[1]
         else:
@@ -748,7 +748,7 @@ class Path_Planning_Menu:
             #process the ending color
             #get color location from the map
             pos = self.mapper.color_locations[user_input]
-            print(pos)
+            # print(pos)
             self.mapper.end_x = pos[0]
             self.mapper.end_y = pos[1]
         else:
@@ -761,17 +761,17 @@ class Path_Planning_Menu:
             print("Empty Map. Load a Full Map first")
             return
         else:
-            print(self.mapper.current_x)
-            print(self.mapper.current_y)
-            print(self.mapper.end_x)
-            print(self.mapper.end_y)
-            # self.mapper.follow_path(self.mapper.movement_planner())
+            # print(self.mapper.current_x)
+            # print(self.mapper.current_y)
+            # print(self.mapper.end_x)
+            # print(self.mapper.end_y)
+            self.mapper.follow_path(self.mapper.movement_planner())
             return
 
     def finished_map(self):
-##        for x in self.mapper.mapped_cells:
-##            if not all(x):
-##                return False
+       for x in self.mapper.mapped_cells:
+           if not all(x):
+               return False
         return True
 
 if __name__ == "__main__":
