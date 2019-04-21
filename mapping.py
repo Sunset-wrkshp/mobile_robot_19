@@ -20,7 +20,7 @@ class Mapper:
                              [False, False, False, False],
                              [False, False, False, False],
                              [False, False, False, False]]
-        # self.color_locations = {'orange': [], [], [], []}
+        self.color_locations = {'orange': [0,0], 'green': [0,0], 'blue': [0,0], 'pink':[0,0]}
 
     def xy_to_cell(self, cell_x, cell_y):
         return (cell_y * 4) + cell_x
@@ -67,8 +67,6 @@ class Mapper:
                     wave_queue.append([cell_x - 1, cell_y])
                     distances[cell_y][cell_x - 1] = distances[cell_y][cell_x] + 1
 
-        #print(distances)
-        #print(self.current_x, self.current_y)
         return distances
 
     def movement_planner(self):
@@ -148,8 +146,24 @@ class Mapper:
                     map[(y * 3) + 1] = map[(y * 3) + 1][0:(x * 5) + 1] + "????" + map[(y * 3) + 1][(x * 5) + 5:]
                     map[(y * 3) + 2] = map[(y * 3) + 2][0:(x * 5) + 1] + "????" + map[(y * 3) + 2][(x * 5) + 5:]
 
+        pos_y = (self.current_y * 3) + 1
+        pos_x = (self.current_x * 5) + 2
+        map[pos_y] = map[pos_y][0:pos_x] + "@" + map[pos_y][pos_x + 1:]
+
         for line in map:
             print(line)
+
+    def sensor_test(self):
+        while self.user_input == None:
+            system('clear')
+            print("front " + str(self.rob.distance_sensor.get_front_inches()))
+            print("left " + str(self.rob.distance_sensor.get_left_inches()))
+            print("right " + str(self.rob.distance_sensor.get_right_inches()))
+            print("Average side: " + str(
+                (rob.distance_sensor.get_right_inches() + rob.distance_sensor.get_left_inches()) / 2))
+            # print(rob.distance_sensor.get_average(0.2))
+            time.sleep(1)
+        system('clear')
 
     def calibration(self):
         user_input = 'c'
@@ -164,6 +178,7 @@ class Mapper:
             print("Dt - Change distance threshold")
             print("Dc - Change wall distance percentage change")
             print("Wd - Change target wall distance")
+            print("St - Sensor test")
             print("R - Change rotation multiplier")
             print("M - Change movement multiplier")
             print("T - Test rotation")
@@ -176,6 +191,11 @@ class Mapper:
                 print("Current wall following Kp value: " + str(self.rob.wall_following_Kp))
                 new_kp = input("Enter new Kp: ")
                 self.rob.wall_following_Kp = float(new_kp)
+                system('clear')
+            elif user_input.lower() == 'st':
+                self.user_input = None
+                Thread(target=self.sensor_test).start()
+                self.user_input = input()
                 system('clear')
             elif user_input.lower() == 'wd':
                 print("Current target wall distance: " + str(self.rob.dist_from_front_wall))
@@ -279,7 +299,7 @@ class Mapper:
 class Mapping_Menu:
     def __init__(self, mapper, debug=False):
         self.mapper = mapper
-        self.wall_samples = 20
+        self.wall_samples = 10
         self.display_menu()
 
     def display_menu(self):
@@ -378,16 +398,15 @@ class Mapping_Menu:
         self.add_walls()
         self.mapper.rob.rotate('r')
         # add back wall
-        time.sleep(0.1)
+        time.sleep(0.05)
         self.add_walls()
-        time.sleep(0.1)
+        time.sleep(0.05)
 
         while self.user_input == None:
-            # system('clear')
+            system('clear')
             self.mapper.draw_map()
             search_x = 0
             search_y = 0
-            #print("searching map")
             while (search_y < 4) and (self.mapper.mapped_cells[search_y][search_x]):
                 while (search_x < 4) and (self.mapper.mapped_cells[search_y][search_x]):
                     search_x += 1
@@ -397,30 +416,30 @@ class Mapping_Menu:
                     search_y += 1
                     search_x = 0
             if (search_y >= 4) or (search_x >= 4):
-                #system('clear')
+                system('clear')
                 self.mapper.draw_map()
                 print("All cells mapped. Press any key to continue.")
                 return
             self.mapper.end_x = search_x
             self.mapper.end_y = search_y
-            #print("Planning path")
             path = self.mapper.movement_planner()
 
             for direction in path:
                 if self.user_input != None:
-                    #system('clear')
+                    system('clear')
                     self.mapper.draw_map()
                     print("Press any key to continue.")
                     return
 
-                self.add_walls()
                 self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
                 self.mapper.rob.change_orientation(direction)
 
                 # A wall is blocking the path
                 if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.dist_from_front_wall:
                     self.mapper.rob.adjust_front_distance()
-                    #print("wall in front")
+                    self.add_walls()
+                    system('clear')
+                    self.mapper.draw_map()
                     break
                 # No wall, continue
                 else:
@@ -440,13 +459,13 @@ class Mapping_Menu:
                         print("Improper value stored in rob.orientation. Should be 'n', 'e', 'w', or 's'")
 
 
-            #print("adding walls")
             self.add_walls()
-            #print("stopped in cell")
+            system('clear')
+            self.mapper.draw_map()
             self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
 
         if self.user_input != None:
-            #system('clear')
+            system('clear')
             self.mapper.draw_map()
             print("Press any key to continue.")
             return
@@ -462,10 +481,8 @@ class Mapping_Menu:
             if ('w' in self.mapper.walls[y][cell_x]) and (cell_x > 0):
                 num_walls_w += 1
         if num_walls_e == 4:
-            #print("E conflicted detected on y axis")
             self.adjust_map('x', 3 - cell_x)
         elif num_walls_w == 4:
-            #print("W conflicted detected on y axis")
             self.adjust_map('x', 0 - cell_x)
 
         # Check for conflicts horizontally
@@ -477,17 +494,14 @@ class Mapping_Menu:
             if ('s' in self.mapper.walls[cell_y][x]) and (cell_y < 3):
                 num_walls_s += 1
         if num_walls_s == 4:
-            #print("S conflicted detected on x axis")
             self.adjust_map('y', 3 - cell_y)
         elif num_walls_n == 4:
-            #print("N conflicted detected on x axis")
             self.adjust_map('y', 0 - cell_y)
 
         # check for gaps vetically
         if cell_x == 0:
             for y in range(4):
                 if (self.mapper.mapped_cells[y][cell_x] == True) and ('w' not in self.mapper.walls[y][cell_x]):
-                    #print("Gap detected on x axis")
                     self.adjust_map('x', 1)
                     cell_x += 1
                     break
@@ -495,7 +509,6 @@ class Mapping_Menu:
         elif cell_x == 3:
             for y in range(4):
                 if (self.mapper.mapped_cells[y][cell_x] == True) and ('e' not in self.mapper.walls[y][cell_x]):
-                    #print("Gap detected on x axis")
                     self.adjust_map('x', -1)
                     cell_x -= 1
                     break
@@ -504,7 +517,6 @@ class Mapping_Menu:
         if cell_y == 0:
             for x in range(4):
                 if (self.mapper.mapped_cells[cell_y][x] == True) and ('n' not in self.mapper.walls[cell_y][x]):
-                    #print("Gap detected on y axis")
                     self.adjust_map('y', 1)
                     cell_y += 1
                     break
@@ -512,7 +524,6 @@ class Mapping_Menu:
         elif cell_y == 3:
             for x in range(4):
                 if (self.mapper.mapped_cells[cell_y][x] == True) and ('s' not in self.mapper.walls[cell_y][x]):
-                    #print("Gap detected on y axis")
                     self.adjust_map('y', -1)
                     cell_y -= 1
                     break
@@ -533,15 +544,24 @@ class Mapping_Menu:
                     new_walls[y][x + magnitude] = self.mapper.walls[y][x]
                     new_mapped[y][x + magnitude] = self.mapper.mapped_cells[y][x]
             self.mapper.current_x += magnitude
+            self.mapper.color_locations['orange'][1] += magnitude
+            self.mapper.color_locations['blue'][1] += magnitude
+            self.mapper.color_locations['green'][1] += magnitude
+            self.mapper.color_locations['pink'][1] += magnitude
         elif axis == 'y':
             for x in range(4):
                 for y in range(max(0, 0 - magnitude), min(4, 4 - magnitude)):
                     new_walls[y + magnitude][x] = self.mapper.walls[y][x]
                     new_mapped[y + magnitude][x] = self.mapper.mapped_cells[y][x]
             self.mapper.current_y += magnitude
+            self.mapper.color_locations['orange'][0] += magnitude
+            self.mapper.color_locations['blue'][0] += magnitude
+            self.mapper.color_locations['green'][0] += magnitude
+            self.mapper.color_locations['pink'][0] += magnitude
 
         self.mapper.mapped_cells = new_mapped
         self.mapper.walls = new_walls
+
 
 
     def add_walls(self):
@@ -560,15 +580,12 @@ class Mapping_Menu:
                 #time.sleep(0.01)
             if num_t > num_f:
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
-        # if (self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance) and (
-        #         front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-            # print("front wall found")
 
         num_f = 0
         num_t = 0
         if left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
             for i in range(self.wall_samples):
-                if self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 1.5):
+                if self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size):
                     num_t += 1
                 else:
                     num_f += 1
@@ -580,26 +597,14 @@ class Mapping_Menu:
         num_t = 0
         if right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
             for i in range(self.wall_samples):
-                if self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 1.5):
+                if self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size):
                     num_t += 1
                 else:
                     num_f += 1
                 #time.sleep(0.01)
             if num_t > num_f:
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
-
-        # if (self.mapper.rob.distance_sensor.get_left_inches() < (self.mapper.rob.cell_size / 2)) and (
-        #         left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-        #     # print("left wall found")
-        #     self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
-        # if (self.mapper.rob.distance_sensor.get_right_inches() < (self.mapper.rob.cell_size / 2)) and (
-        #         right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]):
-        #     # print("right wall found")
-        #     self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
-        #print(self.mapper.walls)
-        #user_input = input()
         self.find_conflicts(self.mapper.current_x, self.mapper.current_y)
-        # print("******")
 
 class Localization_Menu:
     def __init__(self, mapper):
@@ -684,7 +689,6 @@ class Localization_Menu:
 
 
 if __name__ == "__main__":
-    #t1 = threading.Thread(target=main_menu, args=())
     rob = Robot()
     mapper = Mapper(rob)
     mapper.main_menu()
