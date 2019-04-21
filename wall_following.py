@@ -53,7 +53,7 @@ def follow_both(rob, next_cell, stopping_function, Kp, wall_dist):
         if (lwall_dist < rob.max_side_distance) and (rwall_dist < rob.max_side_distance) \
                 and next_cell.right_wall_detected and next_cell.left_wall_detected:
             wall_dist = (lwall_dist + rwall_dist) / 2
-            if (wall_dist < 8.25) and (wall_dist > 7):
+            if (wall_dist < 8) and (wall_dist > 7):
                 rob.dist_from_front_wall = wall_dist
             else:
                 wall_dist = 7.5

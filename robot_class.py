@@ -21,13 +21,13 @@ class Robot():
         self.stop_r = None
 
         self.rotation_Kp = 0.75
-        self.wall_distance_change = 0.1
+        self.wall_distance_change = 0.2
         self.dist_threshold = 1
         self.front_adjustment_Kp = 1.5
         self.dist_from_front_wall = 7
         self.rotation_mult = 1.25
         self.forward_mult = 1.1
-        self.wall_following_Kp = 1
+        self.wall_following_Kp = 0.5
         self.orientation = 'n'
         self.cell_size = 18
         self.max_front_distance = self.cell_size / 1.5
