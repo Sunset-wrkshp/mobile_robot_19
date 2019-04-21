@@ -17,8 +17,8 @@ class Encoder():
     LENCODER = 17
     RENCODER = 18
     # Measurements of the wheel diameter and wheel separation. These variables should be used to ensure consistency
-    WDIAMETER = 2.625
-    WSEPARATION = 4.125
+    WDIAMETER = 2.75
+    WSEPARATION = 4.25
 
     calibrated_inputs = [1.4, 1.42, 1.44, 1.46, 1.48, 1.5, 1.52, 1.54, 1.56, 1.58, 1.6]
     calibrated_speeds = []
