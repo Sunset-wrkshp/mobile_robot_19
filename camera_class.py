@@ -131,18 +131,26 @@ class Camera():
         color_list= [None,None,None,None]
         for x in range(0,4):
             t_list = []
-            for y in range(0,11):
+            t_c = 0
+            f_c = 0
+            for y in range(0,12):
                 blobs = self.get_blobs(x)
                 if len(blobs) > 0:
-                    t_list.append(True)
+##                    t_list.append(True)
+                    t_c = t_c + 1
                     # print("found {}".format(color[x]))
                 else:
-                    t_list.append(False)
+                    f_c = f_c + 1
+##                    t_list.append(False)
             #do majority rule instead?
-            if any(t_list):
+            if (t_c > f_c):
                 color_list[x] = True
             else:
                 color_list[x] = False
+##            if any(t_list):
+##                color_list[x] = True
+##            else:
+##                color_list[x] = False
         print(color_list)
         
 ##        def only1(l):
@@ -178,6 +186,7 @@ if __name__ == "__main__":
 ##            if len(blobs) > 0:
 ##                print("found {}".format(color[x]))
         print("Color found: {}".format(cam.color_get()))
+        time.sleep(0.2)
 
 
     cam.stop()
