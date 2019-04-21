@@ -16,6 +16,7 @@ import cv2 as cv
 import time
 from ThreadedWebcam import ThreadedWebcam
 from UnthreadedWebcam import UnthreadedWebcam
+from os import system
 
 class Camera():
 
@@ -30,17 +31,17 @@ class Camera():
 
 
     # green
-    color_0 = {'minH': 46, 'minS': 86, 'minV': 53,
-               'maxH': 92, 'maxS': 210, 'maxV': 255}
+    color_0 = {'minH': 36, 'minS': 0, 'minV': 125,
+               'maxH': 41, 'maxS': 255, 'maxV': 255}
     # orange
-    color_1 = {'minH': 11, 'minS': 120, 'minV': 0,
-               'maxH': 35, 'maxS': 210, 'maxV': 255}
+    color_1 = {'minH': 11, 'minS': 188, 'minV': 94,
+               'maxH': 22, 'maxS': 255, 'maxV': 255}
     #pink
-    color_2 = {'minH': 162, 'minS': 103, 'minV': 173,
-               'maxH': 180, 'maxS': 204, 'maxV': 255}
+    color_2 = {'minH': 162, 'minS': 103, 'minV': 165,
+               'maxH': 173, 'maxS': 237, 'maxV': 255}
     #blue
-    color_3 = {'minH': 95, 'minS': 105, 'minV': 75,
-               'maxH': 118, 'maxS': 210, 'maxV': 255}
+    color_3 = {'minH': 95, 'minS': 108, 'minV': 132,
+               'maxH': 118, 'maxS': 210, 'maxV': 212}
 
 
     def __init__(self):
@@ -68,6 +69,12 @@ class Camera():
             fs2.release()
 
         fs.release()
+        
+        #set white balance for color detection
+        system('v4l2-ctl -c white_balance_auto_preset=0')
+        system('v4l2-ctl -c red_balance=1450')
+        system('v4l2-ctl -c blue_balance=2300')
+        
         if self.SHOW_BLOBS:
             # Create windows
             cv.namedWindow(self.WINDOW)
@@ -145,13 +152,12 @@ class Camera():
 if __name__ == "__main__":
     cam = Camera()
     while(True):
-        for x in range(0,3):
+        for x in range(0,4):
             blobs = cam.get_blobs(x)
             color = ["green","orange", "pink", "blue"]
             if len(blobs) > 0:
                 print("found {}".format(color[x]))
-            else:
-                print("No color found")
+
 
 
     cam.stop()
