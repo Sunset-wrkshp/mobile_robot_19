@@ -22,7 +22,7 @@ class Robot():
 
         self.rotation_Kp = 0.5
         self.wall_distance_change = 0.1
-        self.dist_threshold = 1.5
+        self.dist_threshold = 1
         self.front_adjustment_Kp = 1.5
         self.dist_from_front_wall = 7
         self.rotation_mult = 1.35
@@ -242,7 +242,7 @@ class Robot():
 
         follow_both(self, next_cell, next_cell.move_to_cell, self.wall_following_Kp, self.dist_from_front_wall)
         self.encoder.stop()
-        if self.distance_sensor.get_front_inches() < self.dist_from_front_wall:
+        if self.distance_sensor.get_front_inches() < self.max_front_distance:
             return True
 
         self.encoder.step_count = (0, 0)
@@ -256,14 +256,14 @@ class Robot():
         if (self.distance_sensor.get_front_inches() < self.max_front_distance) \
                 and (abs(self.distance_sensor.get_front_inches() - self.dist_from_front_wall) > self.dist_threshold):
             self.adjust_front_distance()
-        if (self.distance_sensor.get_right_inches() < self.cell_size / 1.5) \
+        if (self.distance_sensor.get_right_inches() < self.max_side_distance) \
                 and abs(self.distance_sensor.get_right_inches() - self.dist_from_front_wall) > self.dist_threshold:
             self.rotate('r')
             time.sleep(0.05)
             self.adjust_front_distance()
             time.sleep(0.05)
             self.rotate('l')
-        if (self.distance_sensor.get_left_inches() < self.cell_size / 1.5) \
+        if (self.distance_sensor.get_left_inches() < self.max_side_distance) \
                 and abs(self.distance_sensor.get_left_inches() - self.dist_from_front_wall) > self.dist_threshold:
             self.rotate('l')
             time.sleep(0.05)
@@ -312,7 +312,7 @@ class NextCell:
         num_t = 0
         num_f = 0
         for i in range(self.wall_samples):
-            if self.rob.distance_sensor.get_left_inches() < (self.rob.cell_size / 1.5):
+            if self.rob.distance_sensor.get_left_inches() < self.rob.max_side_distance:
                 num_t += 1
             else:
                 num_f += 1
@@ -325,7 +325,7 @@ class NextCell:
         num_t = 0
         num_f = 0
         for i in range(self.wall_samples):
-            if self.rob.distance_sensor.get_right_inches() < (self.rob.cell_size / 1.5):
+            if self.rob.distance_sensor.get_right_inches() < self.rob.max_side_distance:
                 num_t += 1
             else:
                 num_f += 1
@@ -338,28 +338,23 @@ class NextCell:
     # used for moving to the next cell
     # returns false if robot should stop
     def detect_wall_change(self, rdist, ldist):
-        if self.rob.distance_sensor.get_front_inches() < self.rob.dist_from_front_wall:
-            print("wall change: front wall")
+        if self.rob.distance_sensor.get_front_inches() < self.rob.cell_size / 2:
             return True
 
         # wall not detected -> detected
-        if (not self.right_wall_detected) and (self.rob.distance_sensor.get_right_inches() < self.rob.cell_size / 2):
+        if (not self.right_wall_detected) and (self.rob.distance_sensor.get_right_inches() < self.rob.max_side_distance):
             self.right_wall_detected = True
-            print("wall change: right wall detected")
             return True
-        if (not self.left_wall_detected) and (self.rob.distance_sensor.get_left_inches() < self.rob.cell_size / 2):
+        if (not self.left_wall_detected) and (self.rob.distance_sensor.get_left_inches() < self.rob.max_side_distance):
             self.left_wall_detected = True
-            print("wall change: left wall detected")
             return True
 
         # wall detected -> not detected
         if self.right_wall_detected and (abs(rdist - self.prev_right_dist) > (rdist * self.rob.wall_distance_change)):
             self.right_wall_detected = False
-            print("wall change: right wall not detected")
             return True
         if self.left_wall_detected and (abs(ldist - self.prev_left_dist) > (ldist * self.rob.wall_distance_change)):
             self.left_wall_detected = False
-            print("wall change: left wall not detected")
             return True
 
         return False
@@ -371,12 +366,10 @@ class NextCell:
         if self.detect_wall_change(rdist, ldist):
             self.prev_right_dist = self.rob.distance_sensor.get_right_inches()
             self.prev_left_dist = self.rob.distance_sensor.get_left_inches()
-            print("move wall change")
             return False
         if (self.rob.encoder.steps_to_move[0] == -1) and (self.rob.encoder.steps_to_move[1] == -1):
             self.prev_right_dist = self.rob.distance_sensor.get_right_inches()
             self.prev_left_dist = self.rob.distance_sensor.get_left_inches()
-            print("move: encoder ticks -1")
             return False
         self.prev_right_dist = self.rob.distance_sensor.get_right_inches()
         self.prev_left_dist = self.rob.distance_sensor.get_left_inches()
@@ -387,20 +380,17 @@ class NextCell:
     def center_in_cell(self):
         ldist = self.rob.distance_sensor.get_left_inches()
         rdist = self.rob.distance_sensor.get_right_inches()
-        if self.rob.distance_sensor.get_front_inches() < (self.rob.cell_size / 2):
+        if self.rob.distance_sensor.get_front_inches() < self.rob.cell_size / 2:
             self.prev_right_dist = self.rob.distance_sensor.get_right_inches()
             self.prev_left_dist = self.rob.distance_sensor.get_left_inches()
-            print("center: front wall")
             return False
         if (self.rob.encoder.steps_to_move[0] == -1) and (self.rob.encoder.steps_to_move[1] == -1):
-            print("center: encoder steps -1")
             self.prev_right_dist = self.rob.distance_sensor.get_right_inches()
             self.prev_left_dist = self.rob.distance_sensor.get_left_inches()
             return False
 
         # reset encoder steps if the wall state changes: robot was not at the edge of the cell, but is now
         if self.detect_wall_change(rdist, ldist):
-            print("center wall change")
             self.prev_right_dist = self.rob.distance_sensor.get_right_inches()
             self.prev_left_dist = self.rob.distance_sensor.get_left_inches()
             self.rob.encoder.step_count = (0,0)
