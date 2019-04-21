@@ -31,7 +31,7 @@ class Camera():
 
 
     # green
-    color_0 = {'minH': 36, 'minS': 0, 'minV': 125,
+    color_0 = {'minH': 36, 'minS': 60, 'minV': 125,
                'maxH': 41, 'maxS': 255, 'maxV': 255}
     # orange
     color_1 = {'minH': 11, 'minS': 188, 'minV': 94,
@@ -126,38 +126,58 @@ class Camera():
         print("Stopping camera")
         self.stop()
 
-    def color_get():
+    def color_get(self):
         # ["green","orange", "pink", "blue"]
         color_list= [None,None,None,None]
-        for x in range(0,3):
+        for x in range(0,4):
             t_list = []
-            for y in range(0,10):
+            for y in range(0,11):
                 blobs = self.get_blobs(x)
                 if len(blobs) > 0:
                     t_list.append(True)
                     # print("found {}".format(color[x]))
                 else:
                     t_list.append(False)
+            #do majority rule instead?
             if any(t_list):
-                color[x] = True
+                color_list[x] = True
             else:
-                color[x] = False
+                color_list[x] = False
         print(color_list)
-        for val in color_list:
-            if val == True:
-                return color_list.index(val)
-        return None
+        
+##        def only1(l):
+        true_found = False
+        index = -1
+        for v in color_list:
+            if v:
+                # a True was found!
+                if true_found:
+                    # found too many True's
+                    return False 
+                else:
+                    # found the first True
+                    index = color_list.index(v)
+                    true_found = True
+        # found zero or one True value
+        if not any(color_list):
+            return None
+        else:
+            return index
+##        for val in color_list:
+##            if val == True:
+##                return color_list.index(val)
+##        return None
 
 
 if __name__ == "__main__":
     cam = Camera()
     while(True):
-        for x in range(0,4):
-            blobs = cam.get_blobs(x)
-            color = ["green","orange", "pink", "blue"]
-            if len(blobs) > 0:
-                print("found {}".format(color[x]))
-
+##        for x in range(0,4):
+##            blobs = cam.get_blobs(x)
+##            color = ["green","orange", "pink", "blue"]
+##            if len(blobs) > 0:
+##                print("found {}".format(color[x]))
+        print("Color found: {}".format(cam.color_get()))
 
 
     cam.stop()
