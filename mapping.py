@@ -844,7 +844,7 @@ class Localization_Menu:
                                  [False, False, False, False],
                                  [False, False, False, False],
                                  [False, False, False, False]]
-            self.color_locations = {'o': [None, None], 'g': [None, None], 'p': [None, None], 'b': [None, None]}
+            self.mapper.color_locations = {'o': [None, None], 'g': [None, None], 'p': [None, None], 'b': [None, None]}
 
 
 class Path_Planning_Menu:
