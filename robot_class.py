@@ -253,25 +253,27 @@ class Robot():
         self.encoder.stop()
         time.sleep(0.05)
 
+        return False
+
+    def adjust_and_check_colors(self, mapper):
         if (self.distance_sensor.get_front_inches() < self.max_front_distance) \
                 and (abs(self.distance_sensor.get_front_inches() - self.dist_from_front_wall) > self.dist_threshold):
             self.adjust_front_distance()
-        if (self.distance_sensor.get_right_inches() < self.max_side_distance) \
-                and abs(self.distance_sensor.get_right_inches() - self.dist_from_front_wall) > self.dist_threshold:
-            self.rotate('r')
-            time.sleep(0.05)
-            self.adjust_front_distance()
-            time.sleep(0.05)
-            self.rotate('l')
-        if (self.distance_sensor.get_left_inches() < self.max_side_distance) \
-                and abs(self.distance_sensor.get_left_inches() - self.dist_from_front_wall) > self.dist_threshold:
-            self.rotate('l')
-            time.sleep(0.05)
-            self.adjust_front_distance()
-            time.sleep(0.05)
-            self.rotate('r')
+        color = self.camera.color_get()
+        # while color == False:
+        #     print("color = false")
+        #     print(color)
+        #     color = self.mapper.rob.camera.color_get()
+        if color is not None:
+            if color == 0:
+                mapper.color_locations['g'] = [mapper.current_y, mapper.current_x]
+            elif color == 1:
+                mapper.color_locations['o'] = [mapper.current_y, mapper.current_x]
+            elif color == 2:
+                mapper.color_locations['p'] = [mapper.current_y, mapper.current_x]
+            elif color == 3:
+                mapper.color_locations['b'] = [mapper.current_y, mapper.current_x]
         time.sleep(0.05)
-        return False
 
     def adjust_front_distance(self):
         max_forward = self.encoder.get_max_forward_speed() / 2

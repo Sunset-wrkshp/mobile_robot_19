@@ -614,12 +614,12 @@ class Mapping_Menu:
         self.mapper.mapped_cells = new_mapped
         self.mapper.walls = new_walls
 
-
-
     def add_walls(self):
         front_dir = self.mapper.rob.orientation
         left_dir = self.mapper.rob.get_left_dir()
         right_dir = self.mapper.rob.get_right_dir()
+        needs_right_map = False
+        needs_left_map = False
 
         num_f = 0
         num_t = 0
@@ -633,20 +633,7 @@ class Mapping_Menu:
             if num_t > num_f:
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
                 time.sleep(0.1)
-                color = self.mapper.rob.camera.color_get()
-                # while color == False:
-                #     print("color = false")
-                #     print(color)
-                #     color = self.mapper.rob.camera.color_get()
-                if color is not None:
-                    if color == 0:
-                        self.mapper.color_locations['g'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 1:
-                        self.mapper.color_locations['o'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 2:
-                        self.mapper.color_locations['p'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 3:
-                        self.mapper.color_locations['b'] = [self.mapper.current_y, self.mapper.current_x]
+                self.mapper.rob.adjust_and_check_colors(mapper)
                 time.sleep(0.1)
 
         num_f = 0
@@ -659,24 +646,8 @@ class Mapping_Menu:
                     num_f += 1
                 #time.sleep(0.01)
             if num_t > num_f:
+                needs_left_map = True
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
-                time.sleep(0.1)
-                self.mapper.rob.change_orientation(left_dir)
-                color = self.mapper.rob.camera.color_get()
-                # while color == False:
-                #     print("color = false")
-                #     color = self.mapper.rob.camera.color_get()
-                if color is not None:
-                    if color == 0:
-                        self.mapper.color_locations['g'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 1:
-                        self.mapper.color_locations['o'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 2:
-                        self.mapper.color_locations['p'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 3:
-                        self.mapper.color_locations['b'] = [self.mapper.current_y, self.mapper.current_x]
-                time.sleep(0.1)
-                self.mapper.rob.change_orientation(front_dir)
 
         num_f = 0
         num_t = 0
@@ -688,24 +659,36 @@ class Mapping_Menu:
                     num_f += 1
                 #time.sleep(0.01)
             if num_t > num_f:
+                needs_right_map = True
                 self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
+
+        if left_dir in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+            if needs_left_map:
+                time.sleep(0.1)
+                self.mapper.rob.change_orientation(left_dir)
+                self.mapper.rob.adjust_and_check_colors(mapper)
+                time.sleep(0.1)
+            else:
+                if (self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.max_side_distance) \
+                        and abs(self.mapper.rob.distance_sensor.get_left_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
+                    time.sleep(0.1)
+                    self.mapper.rob.change_orientation(left_dir)
+                    self.mapper.rob.adjust_front_distance()
+                    time.sleep(0.1)
+
+        if right_dir in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+            if needs_right_map:
                 time.sleep(0.1)
                 self.mapper.rob.change_orientation(right_dir)
-                color = self.mapper.rob.camera.color_get()
-                # while color == False:
-                #     print("color = false")
-                #     color = self.mapper.rob.camera.color_get()
-                if color is not None:
-                    if color == 0:
-                        self.mapper.color_locations['g'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 1:
-                        self.mapper.color_locations['o'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 2:
-                        self.mapper.color_locations['p'] = [self.mapper.current_y, self.mapper.current_x]
-                    elif color == 3:
-                        self.mapper.color_locations['b'] = [self.mapper.current_y, self.mapper.current_x]
+                self.mapper.rob.adjust_and_check_colors(mapper)
                 time.sleep(0.1)
-                self.mapper.rob.change_orientation(front_dir)
+            else:
+                if (self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.max_side_distance) \
+                        and abs(self.mapper.rob.distance_sensor.get_right_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
+                    time.sleep(0.1)
+                    self.mapper.rob.change_orientation(right_dir)
+                    self.mapper.rob.adjust_front_distance()
+                    time.sleep(0.1)
 
         self.find_conflicts(self.mapper.current_x, self.mapper.current_y)
 
@@ -788,7 +771,6 @@ class Localization_Menu:
                                  [False, False, False, False],
                                  [False, False, False, False],
                                  [False, False, False, False]]
-
 
 
 class Path_Planning_Menu:
