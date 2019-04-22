@@ -188,6 +188,16 @@ class Robot():
         else:
             return 'n'
 
+    def get_back_dir(self):
+        if self.orientation == 'n':
+            return 's'
+        elif self.orientation == 'w':
+            return 'e'
+        elif self.orientation == 's':
+            return 'n'
+        else:
+            return 'w'
+
     def change_orientation(self, direction):
         if direction.lower() == 'n':
             if self.orientation == 'n':

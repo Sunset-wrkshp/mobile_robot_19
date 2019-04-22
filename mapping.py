@@ -618,9 +618,12 @@ class Mapping_Menu:
         front_dir = self.mapper.rob.orientation
         left_dir = self.mapper.rob.get_left_dir()
         right_dir = self.mapper.rob.get_right_dir()
+        back_dir = self.mapper.rob.get_back_dir()
         needs_right_map = False
         needs_left_map = False
         new_walls = []
+        if back_dir in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+            new_walls.append(back_dir)
 
         num_f = 0
         num_t = 0
