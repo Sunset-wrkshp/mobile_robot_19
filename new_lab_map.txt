@@ -1,0 +1,6 @@
+walls
+[[["w", "s", "n"], ["n", "s"], ["n"], ["n", "e"]], [["n", "w"], ["n", "e"], ["e", "w"], ["e", "w"]], [["e", "w"], ["w", "s"], ["s", "e"], ["w", "e"]], [["s", "w"], ["n", "s"], ["n", "s"], ["e", "s"]]]
+mapped cells
+[[true, true, true, true], [true, true, true, true], [true, true, true, true], [true, true, true, true]]
+color locations
+{"b": [3, 1], "p": [0, 3], "g": [2, 0], "o": [1, 3]}
