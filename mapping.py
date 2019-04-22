@@ -504,6 +504,7 @@ class Mapping_Menu:
         while self.user_input == None:
             system('clear')
             self.mapper.draw_map()
+            self.mapper.dot_map()
             search_x = 0
             search_y = 0
             while (search_y < 4) and (self.mapper.mapped_cells[search_y][search_x]):
@@ -517,6 +518,7 @@ class Mapping_Menu:
             if (search_y >= 4) or (search_x >= 4):
                 system('clear')
                 self.mapper.draw_map()
+                self.mapper.dot_map()
                 print("All cells mapped. Press any key to continue.")
                 return
             self.mapper.end_x = search_x
@@ -527,6 +529,7 @@ class Mapping_Menu:
                 if self.user_input != None:
                     system('clear')
                     self.mapper.draw_map()
+                    self.mapper.dot_map()
                     print("Press any key to continue.")
                     return
 
@@ -534,6 +537,7 @@ class Mapping_Menu:
                 self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
                 system('clear')
                 self.mapper.draw_map()
+                self.mapper.dot_map()
                 self.mapper.rob.change_orientation(direction)
 
                 # A wall is blocking the path
@@ -541,6 +545,7 @@ class Mapping_Menu:
                     self.mapper.rob.adjust_front_distance()
                     system('clear')
                     self.mapper.draw_map()
+                    self.mapper.dot_map()
                     break
                 # No wall, continue
                 else:
@@ -563,10 +568,12 @@ class Mapping_Menu:
             self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
             system('clear')
             self.mapper.draw_map()
+            self.mapper.dot_map()
 
         if self.user_input != None:
             system('clear')
             self.mapper.draw_map()
+            self.mapper.dot_map()
             print("Press any key to continue.")
             return
 
