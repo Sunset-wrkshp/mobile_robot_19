@@ -361,9 +361,6 @@ class Mapping_Menu:
 
         file.write("\nmapped cells\n")
         file.write(json.dumps(self.mapper.mapped_cells))
-
-        file.write("\ncolor locations\n")
-        file.write(json.dumps(self.color_locations))
         # for i in self.mapper.mapped_cells:
         #     for j in i:
         #         if j:
@@ -399,8 +396,6 @@ class Mapping_Menu:
             self.mapper.walls = json.loads(data)
             file.readline()
             self.mapper.mapped_cells = json.loads(file.readline())
-            file.readline()
-            self.mapper.color_locations = json.loads(file.readline())
         # if exists:
         #     file = open(user_input, "r")
         #     #skip first line
@@ -448,6 +443,7 @@ class Mapping_Menu:
         # add back wall
         time.sleep(0.05)
         self.add_walls()
+        self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
         time.sleep(0.05)
 
         while self.user_input == None:
@@ -479,8 +475,8 @@ class Mapping_Menu:
                     print("Press any key to continue.")
                     return
 
-                self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
                 self.add_walls()
+                self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
                 system('clear')
                 self.mapper.draw_map()
                 self.mapper.rob.change_orientation(direction)
@@ -508,8 +504,8 @@ class Mapping_Menu:
                     else:
                         print("Improper value stored in rob.orientation. Should be 'n', 'e', 'w', or 's'")
 
-            self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
             self.add_walls()
+            self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x] = True
             system('clear')
             self.mapper.draw_map()
 
@@ -656,8 +652,7 @@ class Mapping_Menu:
                 num_f += 1
             #time.sleep(0.01)
         if num_t > num_f:
-            needs_left_map = True
-            new_walls.append(front_dir)
+            new_walls.append(left_dir)
             #self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
 
         num_f = 0
@@ -670,14 +665,13 @@ class Mapping_Menu:
                 num_f += 1
             #time.sleep(0.01)
         if num_t > num_f:
-            needs_right_map = True
-            new_walls.append(front_dir)
+            new_walls.append(right_dir)
             #self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
 
         self.mapper.walls[self.mapper.current_y][self.mapper.current_x] = new_walls
 
-        if left_dir in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
-            if needs_left_map:
+        if left_dir in new_walls:
+            if not self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x]:
                 time.sleep(0.1)
                 self.mapper.rob.change_orientation(left_dir)
                 self.mapper.rob.adjust_and_check_colors(mapper)
@@ -690,8 +684,8 @@ class Mapping_Menu:
                     self.mapper.rob.adjust_front_distance()
                     time.sleep(0.1)
 
-        if right_dir in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
-            if needs_right_map:
+        if right_dir in new_walls:
+            if not self.mapper.mapped_cells[self.mapper.current_y][self.mapper.current_x]:
                 time.sleep(0.1)
                 self.mapper.rob.change_orientation(right_dir)
                 self.mapper.rob.adjust_and_check_colors(mapper)

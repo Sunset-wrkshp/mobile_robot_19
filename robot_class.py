@@ -25,7 +25,7 @@ class Robot():
         self.dist_threshold = 1
         self.front_adjustment_Kp = 1.5
         self.dist_from_front_wall = 7
-        self.rotation_mult = 1.25
+        self.rotation_mult = 1.3
         self.forward_mult = 1.1
         self.wall_following_Kp = 0.5
         self.orientation = 'n'
