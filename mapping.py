@@ -790,7 +790,7 @@ class Localization_Menu:
             print("********************")
             print("location = " + str(self.mapper.xy_to_cell(self.mapper.current_x, self.mapper.current_y) + 1)
                     +"     orientation = " + self.mapper.rob.orientation.upper())
-            self.dot_map()
+            self.mapper.dot_map()
             self.user_input = input()
 
             # for y in self.mapper.mapped_cells:
