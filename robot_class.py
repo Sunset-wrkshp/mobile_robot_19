@@ -196,6 +196,7 @@ class Robot():
                 self.rotate('l')
             elif self.orientation == 's':
                 self.rotate('l')
+                time.sleep(0.1)
                 self.rotate('l')
             else:
                 self.rotate('r')
@@ -206,6 +207,7 @@ class Robot():
                 self.rotate('l')
             elif self.orientation == 'w':
                 self.rotate('l')
+                time.sleep(0.1)
                 self.rotate('l')
             else:
                 self.rotate('r')
@@ -216,6 +218,7 @@ class Robot():
                 self.rotate('l')
             elif self.orientation == 'n':
                 self.rotate('l')
+                time.sleep(0.1)
                 self.rotate('l')
             else:
                 self.rotate('r')
@@ -226,6 +229,7 @@ class Robot():
                 self.rotate('l')
             elif self.orientation == 'e':
                 self.rotate('l')
+                time.sleep(0.1)
                 self.rotate('l')
             else:
                 self.rotate('r')
