@@ -163,6 +163,16 @@ class Mapper:
         if self.color_locations['b'][0] is not None:
             print("blue: ", self.xy_to_cell(self.color_locations['b'][1], self.color_locations['b'][0]) + 1)
 
+    def dot_map(self):
+        for x in self.mapped_cells:
+            line = ""
+            for val in x:
+                if val is True:
+                    line = line + "X "
+                else:
+                    line = line + ". "
+            print(line)
+
     def sensor_test(self):
         while self.user_input == None:
             system('clear')
@@ -400,7 +410,7 @@ class Mapping_Menu:
 
         file.write("\nmapped cells\n")
         file.write(json.dumps(self.mapper.mapped_cells))
-        
+
         file.write("\ncolor locations\n")
         file.write(json.dumps(self.mapper.color_locations))
         # for i in self.mapper.mapped_cells:
@@ -438,7 +448,7 @@ class Mapping_Menu:
             self.mapper.walls = json.loads(data)
             file.readline()
             self.mapper.mapped_cells = json.loads(file.readline())
-            
+
             file.readline()
             self.mapper.color_locations = json.loads(file.readline())
         # if exists:
@@ -780,6 +790,7 @@ class Localization_Menu:
             print("********************")
             print("location = " + str(self.mapper.xy_to_cell(self.mapper.current_x, self.mapper.current_y) + 1)
                     +"     orientation = " + self.mapper.rob.orientation.upper())
+            self.dot_map()
             self.user_input = input()
 
             # for y in self.mapper.mapped_cells:
