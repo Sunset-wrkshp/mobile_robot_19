@@ -361,6 +361,9 @@ class Mapping_Menu:
 
         file.write("\nmapped cells\n")
         file.write(json.dumps(self.mapper.mapped_cells))
+
+        file.write("\ncolor locations\n")
+        file.write(json.dumps(self.color_locations))
         # for i in self.mapper.mapped_cells:
         #     for j in i:
         #         if j:
@@ -396,6 +399,8 @@ class Mapping_Menu:
             self.mapper.walls = json.loads(data)
             file.readline()
             self.mapper.mapped_cells = json.loads(file.readline())
+            file.readline()
+            self.mapper.color_locations = json.loads(file.readline())
         # if exists:
         #     file = open(user_input, "r")
         #     #skip first line
