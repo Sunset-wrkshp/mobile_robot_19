@@ -625,47 +625,53 @@ class Mapping_Menu:
         right_dir = self.mapper.rob.get_right_dir()
         needs_right_map = False
         needs_left_map = False
+        new_walls = []
 
         num_f = 0
         num_t = 0
-        if front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
-            for i in range(self.wall_samples):
-                if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
-                    num_t += 1
-                else:
-                    num_f += 1
-                #time.sleep(0.01)
-            if num_t > num_f:
-                self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
-                time.sleep(0.1)
-                self.mapper.rob.adjust_and_check_colors(mapper)
-                time.sleep(0.1)
+        #if front_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+        for i in range(self.wall_samples):
+            if self.mapper.rob.distance_sensor.get_front_inches() < self.mapper.rob.max_front_distance:
+                num_t += 1
+            else:
+                num_f += 1
+            #time.sleep(0.01)
+        if num_t > num_f:
+            new_walls.append(front_dir)
+            #self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(front_dir)
+            time.sleep(0.1)
+            self.mapper.rob.adjust_and_check_colors(mapper)
+            time.sleep(0.1)
 
         num_f = 0
         num_t = 0
-        if left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
-            for i in range(self.wall_samples):
-                if self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.cell_size:
-                    num_t += 1
-                else:
-                    num_f += 1
-                #time.sleep(0.01)
-            if num_t > num_f:
-                needs_left_map = True
-                self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
+        #if left_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+        for i in range(self.wall_samples):
+            if self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.cell_size:
+                num_t += 1
+            else:
+                num_f += 1
+            #time.sleep(0.01)
+        if num_t > num_f:
+            needs_left_map = True
+            new_walls.append(front_dir)
+            #self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(left_dir)
 
         num_f = 0
         num_t = 0
-        if right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
-            for i in range(self.wall_samples):
-                if self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.cell_size:
-                    num_t += 1
-                else:
-                    num_f += 1
-                #time.sleep(0.01)
-            if num_t > num_f:
-                needs_right_map = True
-                self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
+        #if right_dir not in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
+        for i in range(self.wall_samples):
+            if self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.cell_size:
+                num_t += 1
+            else:
+                num_f += 1
+            #time.sleep(0.01)
+        if num_t > num_f:
+            needs_right_map = True
+            new_walls.append(front_dir)
+            #self.mapper.walls[self.mapper.current_y][self.mapper.current_x].append(right_dir)
+
+        self.mapper.walls[self.mapper.current_y][self.mapper.current_x] = new_walls
 
         if left_dir in self.mapper.walls[self.mapper.current_y][self.mapper.current_x]:
             if needs_left_map:
