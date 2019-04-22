@@ -155,13 +155,13 @@ class Mapper:
             print(line)
         # [green, orange, pink, blue] camera color_get()
         if self.color_locations['g'][0] is not None:
-            print("green: ", self.xy_to_cell(self.color_locations['g'][1], self.color_locations['g'][0]))
+            print("green: ", self.xy_to_cell(self.color_locations['g'][1], self.color_locations['g'][0]) + 1)
         if self.color_locations['o'][0] is not None:
-            print("orange: ", self.xy_to_cell(self.color_locations['o'][1], self.color_locations['o'][0]))
+            print("orange: ", self.xy_to_cell(self.color_locations['o'][1], self.color_locations['o'][0]) + 1)
         if self.color_locations['p'][0] is not None:
-            print("pink: ", self.xy_to_cell(self.color_locations['p'][1], self.color_locations['p'][0]))
+            print("pink: ", self.xy_to_cell(self.color_locations['p'][1], self.color_locations['p'][0]) + 1)
         if self.color_locations['b'][0] is not None:
-            print("blue: ", self.xy_to_cell(self.color_locations['b'][1], self.color_locations['b'][0]))
+            print("blue: ", self.xy_to_cell(self.color_locations['b'][1], self.color_locations['b'][0]) + 1)
 
     def sensor_test(self):
         while self.user_input == None:
@@ -286,8 +286,47 @@ class Mapper:
 
     def follow_path(self, path):
         for direction in path:
+            left_dir = self.rob.get_left_dir()
+            right_dir = self.rob.get_right_dir()
+
+            needs_left_adjustment = False
+            needs_right_adjustment = False
+
+            if left_dir in self.walls[self.current_y][self.current_x]:
+                if abs(self.rob.distance_sensor.get_left_inches() - self.rob.dist_from_front_wall) \
+                        > self.rob.dist_threshold:
+                    needs_left_adjustment = True
+
+            if right_dir in self.walls[self.current_y][self.current_x]:
+                if abs(self.rob.distance_sensor.get_right_inches() - self.rob.dist_from_front_wall) \
+                        > self.rob.dist_threshold:
+                    needs_right_adjustment = True
+
+            if needs_left_adjustment:
+                time.sleep(0.1)
+                self.rob.change_orientation(left_dir)
+                self.rob.adjust_front_distance()
+                time.sleep(0.1)
+
+            if needs_right_adjustment and not needs_left_adjustment:
+                time.sleep(0.1)
+                self.rob.change_orientation(right_dir)
+                self.rob.adjust_front_distance()
+                time.sleep(0.1)
+
             self.rob.change_orientation(direction)
             stopped_early = self.rob.forward()
+
+            orientation = self.rob.orientation.lower()
+            if orientation == 'n':
+                self.current_y -= 1
+            elif orientation == 'e':
+                self.current_x += 1
+            elif orientation == 's':
+                self.current_y += 1
+            elif orientation == 'w':
+                self.current_x -= 1
+
             if stopped_early:
                 return
 
@@ -361,6 +400,9 @@ class Mapping_Menu:
 
         file.write("\nmapped cells\n")
         file.write(json.dumps(self.mapper.mapped_cells))
+        
+        file.write("\ncolor locations\n")
+        file.write(json.dumps(self.mapper.color_locations))
         # for i in self.mapper.mapped_cells:
         #     for j in i:
         #         if j:
@@ -396,6 +438,9 @@ class Mapping_Menu:
             self.mapper.walls = json.loads(data)
             file.readline()
             self.mapper.mapped_cells = json.loads(file.readline())
+            
+            file.readline()
+            self.mapper.color_locations = json.loads(file.readline())
         # if exists:
         #     file = open(user_input, "r")
         #     #skip first line
@@ -677,8 +722,9 @@ class Mapping_Menu:
                 self.mapper.rob.adjust_and_check_colors(mapper)
                 time.sleep(0.1)
             else:
-                if (self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.max_side_distance) \
-                        and abs(self.mapper.rob.distance_sensor.get_left_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
+                #if (self.mapper.rob.distance_sensor.get_left_inches() < self.mapper.rob.max_side_distance) \
+                #        and abs(self.mapper.rob.distance_sensor.get_left_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
+                if abs(self.mapper.rob.distance_sensor.get_left_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
                     time.sleep(0.1)
                     self.mapper.rob.change_orientation(left_dir)
                     self.mapper.rob.adjust_front_distance()
@@ -691,8 +737,9 @@ class Mapping_Menu:
                 self.mapper.rob.adjust_and_check_colors(mapper)
                 time.sleep(0.1)
             else:
-                if (self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.max_side_distance) \
-                        and abs(self.mapper.rob.distance_sensor.get_right_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
+                #if (self.mapper.rob.distance_sensor.get_right_inches() < self.mapper.rob.max_side_distance) \
+                #        and abs(self.mapper.rob.distance_sensor.get_right_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
+                if abs(self.mapper.rob.distance_sensor.get_right_inches() - self.mapper.rob.dist_from_front_wall) > self.mapper.rob.dist_threshold:
                     time.sleep(0.1)
                     self.mapper.rob.change_orientation(right_dir)
                     self.mapper.rob.adjust_front_distance()
@@ -779,6 +826,7 @@ class Localization_Menu:
                                  [False, False, False, False],
                                  [False, False, False, False],
                                  [False, False, False, False]]
+            self.color_locations = {'o': [None, None], 'g': [None, None], 'p': [None, None], 'b': [None, None]}
 
 
 class Path_Planning_Menu:
@@ -835,8 +883,8 @@ class Path_Planning_Menu:
             #get color location from the map
             pos = self.mapper.color_locations[user_input]
             # print(pos)
-            self.mapper.current_x = pos[0]
-            self.mapper.current_y = pos[1]
+            self.mapper.current_y = pos[0]
+            self.mapper.current_x = pos[1]
         else:
             print("Improper Color.")
             return
@@ -847,8 +895,8 @@ class Path_Planning_Menu:
             #get color location from the map
             pos = self.mapper.color_locations[user_input]
             # print(pos)
-            self.mapper.end_x = pos[0]
-            self.mapper.end_y = pos[1]
+            self.mapper.end_y = pos[0]
+            self.mapper.end_x = pos[1]
         else:
             print("Improper color.")
             return
